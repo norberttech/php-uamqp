@@ -1,0 +1,48 @@
+---
+- name: Configure hireinsocial vagrant dev env
+  hosts: all
+  become: yes
+  remote_user: vagrant
+  vars:
+    env_timezone: "UTC"
+
+    php_ini_lines:
+      - 'date.timezone = "UTC"'
+      - 'display_errors = On'
+      - 'short_open_tag = 0'
+
+    php_version: "7.2"
+    php_extensions:
+      - "php{{ php7_version }}-cli"
+      - "php{{ php7_version }}-dev"
+
+    azure_c_shared_utility_dir: "/home/vagrant/azure-c-shared-utility"
+    azure_uamqp_c_dir: "/home/vagrant/azure-uamqp-c"
+
+  tasks:
+    - name: install basic tools required to compile php
+      package:
+        state: present
+        name: "{{ item }}"
+      with_items:
+        - "gcc"
+        - "make"
+        - "autoconf"
+      tags: ["tools"]
+
+    - name: intall dependecies of azure-uamqp-c
+      package:
+        state: present
+        name: "{{ item }}"
+      with_items:
+        - "git"
+        - "cmake"
+        - "build-essential"
+        - "curl"
+        - "libcurl4-openssl-dev"
+        - "libssl-dev"
+        - "uuid-dev"
+      tags: ["tools", "azure-uamqp-c"]
+
+- { role: "iroquoisorg.env" }
+    - { role: "iroquoisorg.php7" }#  roles:

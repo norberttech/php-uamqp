@@ -1,0 +1,9 @@
+[submodule "ext/deps/azure-uamqp-c"]
+	path = ext/deps/azure-uamqp-c
+	url = https://github.com/Azure/azure-uamqp-c.git
+[submodule "ext/deps/azure-c-shared-utility"]
+	path = ext/deps/azure-c-shared-utility
+	url = https://github.com/Azure/azure-c-shared-utility.git
+[submodule "ext/deps/umock-c"]
+	path = ext/deps/umock-c
+	url = https://github.com/Azure/umock-c.git

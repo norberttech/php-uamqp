@@ -1,0 +1,28 @@
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
+
+Vagrant.configure(2) do |config|
+
+  config.vm.define :php_uamqp, primary: true do |php_uamqp|
+    php_uamqp.vm.box = "bento/ubuntu-16.04"
+    php_uamqp.vm.network :private_network, ip: "10.0.0.200"
+    php_uamqp.ssh.forward_agent = true
+
+    php_uamqp.vm.provider :virtualbox do |v|
+      v.gui = false
+      v.name = "php-uamqp"
+      v.memory = 4096
+      v.cpus = 2
+    end
+
+    php_uamqp.vm.synced_folder "../ext", "/home/vagrant/php-uamqp", id: "php-uamqp", type: "nfs"
+
+    php_uamqp.vm.provision "ansible_local" do |ansible|
+      ansible.galaxy_role_file = "ansible/requirements.yml"
+      ansible.galaxy_roles_path = "ansible/roles"
+      ansible.galaxy_command = "ansible-galaxy install --role-file=%{role_file} --roles-path=%{roles_path}"
+      ansible.playbook = "ansible/playbook.yml"
+      ansible.version = "2.5.4"
+      ansible.install_mode = "pip"
+    end
+  end
+end
