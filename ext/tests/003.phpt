@@ -1,5 +1,5 @@
 --TEST--
-UAMQPConnection() initial state test
+UAMQPConnection() connection test
 --SKIPIF--
 <?php
 if (!extension_loaded('uamqp')) {
@@ -10,7 +10,8 @@ if (!extension_loaded('uamqp')) {
 <?php
 $connection = new \UAMQP\Connection();
 
-var_dump($connection->isConnected());
+$connection->connect();
+$connection->connect();
 ?>
 --EXPECT--
-bool(false)
+already connected

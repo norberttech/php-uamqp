@@ -1,0 +1,1 @@
+#define STR_AND_LEN(str) str, sizeof(str) - 1

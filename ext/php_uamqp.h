@@ -7,6 +7,8 @@ extern zend_module_entry uamqp_module_entry;
 #define PHP_UAMQP_VERSION "0.0.1"
 #define PHP_UAMQP_EXTNAME "uamqp"
 
+#define PHP_UAMQP_NAMESPACE "UAMQP"
+
 #ifdef PHP_WIN32
 #	define PHP_UAMQP_API __declspec(dllexport)
 #elif defined(__GNUC__) && __GNUC__ >= 4
