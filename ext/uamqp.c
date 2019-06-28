@@ -7,7 +7,7 @@
 #include "php.h"
 #include "ext/standard/info.h"
 #include "php_uamqp.h"
-#include "src/uamqp_connection.h"
+#include "src/php/php_uamqp_connection.h"
 
 /* For compatibility with older PHP versions */
 #ifndef ZEND_PARSE_PARAMETERS_NONE

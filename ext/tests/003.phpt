@@ -8,9 +8,8 @@ if (!extension_loaded('uamqp')) {
 ?>
 --FILE--
 <?php
-$connection = new \UAMQP\Connection();
+$connection = new \UAMQP\Connection("norbert-fulfillment-dev-service-bus.servicebus.windows.net", 5671, true, 'RootManageSharedAccessKey', 'test');
 
-$connection->connect();
 $connection->connect();
 ?>
 --EXPECT--
