@@ -5,7 +5,6 @@
 #include <php.h>
 #include <stdbool.h>
 #include "../../php_uamqp.h"
-#include "../uamqp/uamqp_connection.h"
 #include "php_uamqp_connection.h"
 
 zend_class_entry *uamqp_connection_class_entry;
@@ -21,8 +20,8 @@ zend_object_handlers uamqp_connection_object_handlers;
 METHOD(__construct)
 {
     zend_string *host, *policyName, *policyKey;
-    zend_long *port;
-    zend_bool *useTLS;
+    zend_long port;
+    zend_bool useTLS;
 
     uamqp_connection_object *object;
 
@@ -59,7 +58,7 @@ METHOD(port)
 
     uamqp_connection_object *object = UAMQP_CONNECTION_OBJECT(getThis());
 
-    RETVAL_LONG(object->properties.port);
+    RETVAL_LONG((int) object->properties.port);
 }
 
 METHOD(useTLS)
@@ -98,24 +97,31 @@ METHOD(isConnected)
     RETURN_BOOL(object->properties.isConnected);
 }
 
-METHOD(connect)
+METHOD(sendMessage)
 {
-    zend_parse_parameters_none();
+    zend_string *message;
+    zend_string *destination;
+    uamqp_connection_object *object;
+    struct uamqp_connection uamqp_connection;
+    struct uamqp_session uamqp_session;
 
-    uamqp_connection_object *object = UAMQP_CONNECTION_OBJECT(getThis());
+    ZEND_PARSE_PARAMETERS_START(2, 2)
+        Z_PARAM_STR(message)
+        Z_PARAM_STR(destination)
+    ZEND_PARSE_PARAMETERS_END();
 
-    if (object->properties.isConnected) {
-        php_printf("already connected");
-        return ;
-    }
+    object = UAMQP_CONNECTION_OBJECT(getThis());
 
-    object->uamqpConnection = create_uamqp_connection(ZSTR_VAL(object->properties.host), object->properties.port, ZSTR_VAL(object->properties.policyName), ZSTR_VAL(object->properties.policyKey));
-    object->uamqpConnectionSession = create_uamqp_session(object->uamqpConnection);
-    MESSAGE_SENDER_HANDLE sender = create_message_sender(object->uamqpConnectionSession, ZSTR_VAL(object->properties.host), "testname");
-    MESSAGE_HANDLE message = create_message("test message");
-    send_message(object->uamqpConnection, sender, message);
+    uamqp_connection = create_uamqp_connection(ZSTR_VAL(object->properties.host), object->properties.port, ZSTR_VAL(object->properties.policyName), ZSTR_VAL(object->properties.policyKey));
+    uamqp_session = create_uamqp_session(uamqp_connection);
 
-    object->properties.isConnected = true;
+    send_message(
+        uamqp_connection,
+        create_message_sender(uamqp_session, ZSTR_VAL(object->properties.host), ZSTR_VAL(destination)),
+        create_message(ZSTR_VAL(message))
+    );
+
+    destroy_connection(uamqp_connection, uamqp_session);
 }
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_void, 0, 0, 0)
@@ -129,7 +135,7 @@ zend_function_entry uamqp_connection_class_functions[] = {
     ME(policyName, arginfo_void, ZEND_ACC_PUBLIC)
     ME(policyKey, arginfo_void, ZEND_ACC_PUBLIC)
     ME(isConnected, arginfo_void, ZEND_ACC_PUBLIC)
-    ME(connect, arginfo_void, ZEND_ACC_PUBLIC)
+    ME(sendMessage, arginfo_void, ZEND_ACC_PUBLIC)
     PHP_FE_END
 };
 

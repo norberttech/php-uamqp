@@ -1,8 +1,15 @@
 ## php-uamqp
 
 ```
+cd deps/azure-uamqp-c
+mkdir cmkae
+cd cmake
+cmake ..
+cmake --build .
+cd ../..
+
 phpize
-./configure --enable-uamqp
+./configure
 make
 sudo make install
 ```
