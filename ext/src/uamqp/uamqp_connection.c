@@ -13,7 +13,6 @@ struct uamqp_connection create_uamqp_connection(char *host, int port, char *poli
 {
     struct uamqp_connection connection;
 
-
     const IO_INTERFACE_DESCRIPTION* tlsio_interface;
     TLSIO_CONFIG tls_io_config = { host, port };
     SASLCLIENTIO_CONFIG sasl_io_config;
@@ -27,7 +26,6 @@ struct uamqp_connection create_uamqp_connection(char *host, int port, char *poli
     // Create TLS IO
     tlsio_interface = platform_get_default_tlsio();
     connection.tls_io = xio_create(tlsio_interface, &tls_io_config);
-
 
     // Create SASL IO
     connection.sasl_mechanism_handle  = saslmechanism_create(saslplain_get_interface(), &sasl_plain_config);
@@ -44,6 +42,8 @@ struct uamqp_connection create_uamqp_connection(char *host, int port, char *poli
 
     connection_open(connection.connection);
 
+    connection_dowork(connection.connection);
+    
     return connection;
 }
 
@@ -58,13 +58,19 @@ struct uamqp_session create_uamqp_session(struct uamqp_connection connection)
     return session;
 }
 
-void destroy_connection(struct uamqp_connection uamqp_connection, struct uamqp_session uamqp_session)
+void destroy_connection(struct uamqp_connection *uamqp_connection, struct uamqp_session *uamqp_session)
 {
-    session_destroy(uamqp_session.session);
-    connection_destroy(uamqp_connection.connection);
-    xio_destroy(uamqp_connection.sasl_io);
-    xio_destroy(uamqp_connection.tls_io);
-    saslmechanism_destroy(uamqp_connection.sasl_mechanism_handle);
+    session_destroy(uamqp_session->session);
+    connection_destroy(uamqp_connection->connection);
+    xio_destroy(uamqp_connection->sasl_io);
+    xio_destroy(uamqp_connection->tls_io);
+    saslmechanism_destroy(uamqp_connection->sasl_mechanism_handle);
+
+    uamqp_connection->connection = NULL;
+    uamqp_connection->tls_io = NULL;
+    uamqp_connection->sasl_io = NULL;
+    uamqp_connection->sasl_mechanism_handle = NULL;
+    uamqp_session->session = NULL;
 
     platform_deinit();
 }

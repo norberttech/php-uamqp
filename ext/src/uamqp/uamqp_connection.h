@@ -14,4 +14,4 @@ struct uamqp_session {
 struct uamqp_connection create_uamqp_connection(char *host, int port, char *policyName, char *policyKey);
 struct uamqp_session create_uamqp_session(struct uamqp_connection connection);
 
-void destroy_connection(struct uamqp_connection uamqp_connection, struct uamqp_session uamqp_session);
+void destroy_connection(struct uamqp_connection *uamqp_connection, struct uamqp_session *uamqp_session);
