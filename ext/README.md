@@ -1,17 +1,17 @@
 ## php-uamqp
 
 ```
-cd deps/azure-uamqp-c
-mkdir cmkae
-cd cmake
-cmake ..
-cmake --build .
-cd ../..
-
+./init.sh
 phpize
 ./configure
 make
-sudo make install
+make test
+```
+
+To install extension after all tests are passing execute:
+
+```
+sudo make intall
 ```
 
 To test extension in interactive mode run:
