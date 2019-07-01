@@ -9,6 +9,8 @@
 #include "../uamqp/uamqp_message_sender.h"
 
 zend_class_entry *uamqp_connection_class_entry;
+zend_object_handlers uamqp_connection_object_handlers;
+
 #define this_ce uamqp_connection_class_entry
 #define METHOD(name) PHP_METHOD(UAMQPConnection, name)
 #define ME(name, arginfo, visibility) PHP_ME(UAMQPConnection, name, arginfo, visibility)
@@ -35,9 +37,6 @@ typedef struct _uamqp_connection_object {
 static inline uamqp_connection_object *php_uamqp_connection_fetch_object(zend_object *obj) {
     return (uamqp_connection_object *)((char*)(obj) - XtOffsetOf(uamqp_connection_object, zendObject));
 }
-
-
-zend_object_handlers uamqp_connection_object_handlers;
 
 METHOD(__construct)
 {
@@ -158,19 +157,27 @@ METHOD(sendMessage)
     );
 }
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_void, 0, 0, 0)
+ZEND_BEGIN_ARG_INFO_EX(connection_construct_arginfo, 0, 0, 0)
+    ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
+    ZEND_ARG_TYPE_INFO(0, port, IS_LONG, 0)
+    ZEND_ARG_TYPE_INFO(0, useTLS, _IS_BOOL, 0)
+    ZEND_ARG_TYPE_INFO(0, policyName, IS_STRING, 0)
+    ZEND_ARG_TYPE_INFO(0, policyKey, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(connection_void_arginfo, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 zend_function_entry uamqp_connection_class_functions[] = {
-    ME(__construct, arginfo_void, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
-    ME(host, arginfo_void, ZEND_ACC_PUBLIC)
-    ME(port, arginfo_void, ZEND_ACC_PUBLIC)
-    ME(useTLS, arginfo_void, ZEND_ACC_PUBLIC)
-    ME(policyName, arginfo_void, ZEND_ACC_PUBLIC)
-    ME(policyKey, arginfo_void, ZEND_ACC_PUBLIC)
-    ME(isConnected, arginfo_void, ZEND_ACC_PUBLIC)
-    ME(disconnect, arginfo_void, ZEND_ACC_PUBLIC)
-    ME(sendMessage, arginfo_void, ZEND_ACC_PUBLIC)
+    ME(__construct, connection_construct_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+    ME(host, connection_void_arginfo, ZEND_ACC_PUBLIC)
+    ME(port, connection_void_arginfo, ZEND_ACC_PUBLIC)
+    ME(useTLS, connection_void_arginfo, ZEND_ACC_PUBLIC)
+    ME(policyName, connection_void_arginfo, ZEND_ACC_PUBLIC)
+    ME(policyKey, connection_void_arginfo, ZEND_ACC_PUBLIC)
+    ME(isConnected, connection_void_arginfo, ZEND_ACC_PUBLIC)
+    ME(disconnect, connection_void_arginfo, ZEND_ACC_PUBLIC)
+    ME(sendMessage, connection_void_arginfo, ZEND_ACC_PUBLIC)
     PHP_FE_END
 };
 

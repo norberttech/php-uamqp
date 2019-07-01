@@ -8,6 +8,7 @@
 #include "ext/standard/info.h"
 #include "php_uamqp.h"
 #include "src/php/php_uamqp_connection.h"
+#include "src/php/php_uamqp_message.h"
 
 /* For compatibility with older PHP versions */
 #ifndef ZEND_PARSE_PARAMETERS_NONE
@@ -32,9 +33,6 @@ PHP_MINFO_FUNCTION(uamqp)
     php_info_print_table_end();
 }
 
-ZEND_BEGIN_ARG_INFO(arginfo_uamqp_test1, 0)
-ZEND_END_ARG_INFO()
-
 static const zend_function_entry uamqp_functions[] = {
     PHP_FE_END
 };
@@ -43,6 +41,7 @@ static const zend_function_entry uamqp_functions[] = {
 static PHP_MINIT_FUNCTION(uamqp)
 {
     PHP_MINIT(uamqp_connection)(INIT_FUNC_ARGS_PASSTHRU);
+    PHP_MINIT(uamqp_message)(INIT_FUNC_ARGS_PASSTHRU);
 
     return SUCCESS;
 }
