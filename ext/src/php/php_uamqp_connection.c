@@ -24,7 +24,7 @@ METHOD(__construct)
 
     uamqp_connection_object *object;
 
-    ZEND_PARSE_PARAMETERS_START(5, 5)
+    ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 5, 5)
         Z_PARAM_STR(host)
         Z_PARAM_LONG(port)
         Z_PARAM_BOOL(useTLS)
@@ -90,7 +90,7 @@ METHOD(policyKey)
     RETVAL_STR(object->properties.policyKey);
 }
 
-ZEND_BEGIN_ARG_INFO_EX(connection_construct_arginfo, 0, 0, 0)
+ZEND_BEGIN_ARG_INFO_EX(connection_construct_arginfo, 0, 0, 5)
     ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, port, IS_LONG, 0)
     ZEND_ARG_TYPE_INFO(0, useTLS, _IS_BOOL, 0)

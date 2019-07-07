@@ -29,7 +29,7 @@ METHOD(__construct)
     zval *connectiona_argument;
     uamqp_connection_object *connection;
 
-    ZEND_PARSE_PARAMETERS_START(1, 1);
+    ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1);
         Z_PARAM_OBJECT_OF_CLASS_EX(connectiona_argument, php_uamqp_connection_ce(), 1, 0);
     ZEND_PARSE_PARAMETERS_END();
 
@@ -44,7 +44,7 @@ METHOD(sendMessage)
     uamqp_message_object *message;
     uamqp_producer_object *object;
 
-    ZEND_PARSE_PARAMETERS_START(1, 1)
+    ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
         Z_PARAM_OBJECT_OF_CLASS_EX(message_argument, php_uamqp_message_ce(), 1, 0);
     ZEND_PARSE_PARAMETERS_END();
 
@@ -58,12 +58,17 @@ METHOD(sendMessage)
     );
 }
 
-ZEND_BEGIN_ARG_INFO_EX(producer_void_arginfo, 0, 0, 0)
+ZEND_BEGIN_ARG_INFO_EX(producer_construct_arginfo, 0, 0, 1)
+    ZEND_ARG_OBJ_INFO(0, message, UAMQP\\Connection, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(producer_sendMessage_arginfo, 0, 0, 1)
+    ZEND_ARG_OBJ_INFO(0, message, UAMQP\\Message, 0)
 ZEND_END_ARG_INFO()
 
 zend_function_entry uamqp_producer_class_functions[] = {
-    ME(__construct, producer_void_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
-    ME(sendMessage, producer_void_arginfo, ZEND_ACC_PUBLIC)
+    ME(__construct, producer_construct_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+    ME(sendMessage, producer_sendMessage_arginfo, ZEND_ACC_PUBLIC)
     PHP_FE_END
 };
 
