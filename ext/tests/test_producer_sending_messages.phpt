@@ -1,5 +1,5 @@
 --TEST--
-UAMQPConnection() sending message to queue without implicit call to disconnect method
+\UAQMP\Producer() sending message to destination
 --SKIPIF--
 <?php
 if (!extension_loaded('uamqp')) {
@@ -16,8 +16,9 @@ if (!getenv('PHP_UAMQP_TEST_SB_POLICY_NAME')) {
 
 $connection = new \UAMQP\Connection(getenv('PHP_UAMQP_TEST_SB_HOST'), 5671, true, getenv('PHP_UAMQP_TEST_SB_POLICY_NAME'), getenv('PHP_UAMQP_TEST_SB_POLICY_KEY'));
 
-$connection->sendMessage("test", "testname");
-$connection->sendMessage("test 1", "testname");
+$producer = new \UAMQP\Producer($connection);
+$producer->sendMessage(new \UAMQP\Message($payload = "test", $destination = "testname"));
+$producer->sendMessage(new \UAMQP\Message($payload = "test", $destination = "testname"));
 
 ?>
 --EXPECTF--

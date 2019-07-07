@@ -9,13 +9,7 @@
 #include "php_uamqp.h"
 #include "src/php/php_uamqp_connection.h"
 #include "src/php/php_uamqp_message.h"
-
-/* For compatibility with older PHP versions */
-#ifndef ZEND_PARSE_PARAMETERS_NONE
-#define ZEND_PARSE_PARAMETERS_NONE() \
-	ZEND_PARSE_PARAMETERS_START(0, 0) \
-	ZEND_PARSE_PARAMETERS_END()
-#endif
+#include "src/php/php_uamqp_producer.h"
 
 PHP_RINIT_FUNCTION(uamqp)
 {
@@ -42,6 +36,7 @@ static PHP_MINIT_FUNCTION(uamqp)
 {
     PHP_MINIT(uamqp_connection)(INIT_FUNC_ARGS_PASSTHRU);
     PHP_MINIT(uamqp_message)(INIT_FUNC_ARGS_PASSTHRU);
+    PHP_MINIT(uamqp_producer)(INIT_FUNC_ARGS_PASSTHRU);
 
     return SUCCESS;
 }

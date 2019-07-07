@@ -40,10 +40,8 @@ struct uamqp_connection create_uamqp_connection(char *host, int port, char *poli
     connection.connection = connection_create(connection.sasl_io, host, "php-uaqmp-binding", NULL, NULL);
     connection_set_trace(connection.connection, 1);
 
-    connection_open(connection.connection);
+//    connection_open(connection.connection);
 
-    connection_dowork(connection.connection);
-    
     return connection;
 }
 
