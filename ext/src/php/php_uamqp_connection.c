@@ -98,16 +98,19 @@ ZEND_BEGIN_ARG_INFO_EX(connection_construct_arginfo, 0, 0, 5)
     ZEND_ARG_TYPE_INFO(0, policyKey, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(connection_void_arginfo, 0, 0, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(connection_void_string_arginfo, 0, 0, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(connection_void_long_arginfo, 0, 0, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 zend_function_entry uamqp_connection_class_functions[] = {
     ME(__construct, connection_construct_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
-    ME(host, connection_void_arginfo, ZEND_ACC_PUBLIC)
-    ME(port, connection_void_arginfo, ZEND_ACC_PUBLIC)
-    ME(useTLS, connection_void_arginfo, ZEND_ACC_PUBLIC)
-    ME(policyName, connection_void_arginfo, ZEND_ACC_PUBLIC)
-    ME(policyKey, connection_void_arginfo, ZEND_ACC_PUBLIC)
+    ME(host, connection_void_string_arginfo, ZEND_ACC_PUBLIC)
+    ME(port, connection_void_long_arginfo, ZEND_ACC_PUBLIC)
+    ME(useTLS, connection_void_long_arginfo, ZEND_ACC_PUBLIC)
+    ME(policyName, connection_void_string_arginfo, ZEND_ACC_PUBLIC)
+    ME(policyKey, connection_void_string_arginfo, ZEND_ACC_PUBLIC)
     PHP_FE_END
 };
 
