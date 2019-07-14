@@ -1,5 +1,5 @@
 --TEST--
-\UAQMP\Producer() sending message to destination
+\UAQMP\Producer sending message to destination in debug mode
 --SKIPIF--
 <?php
 if (!extension_loaded('uamqp')) {

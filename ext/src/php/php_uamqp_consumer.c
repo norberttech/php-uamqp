@@ -106,7 +106,7 @@ ZEND_BEGIN_ARG_INFO_EX(consumer_construct_arginfo, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(consumer_listen_arginfo, 0, 0, 2)
-    ZEND_ARG_INFO(0, callback)
+    ZEND_ARG_CALLABLE_INFO(0, callback, 0)
     ZEND_ARG_OBJ_INFO(0, message, UAMQP\\Destination, 0)
 ZEND_END_ARG_INFO()
 

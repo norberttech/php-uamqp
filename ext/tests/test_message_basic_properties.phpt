@@ -1,5 +1,5 @@
 --TEST--
-UAMQPConnection() initial state test
+\UAMQP\Message class basic properties
 --SKIPIF--
 <?php
 if (!extension_loaded('uamqp')) {

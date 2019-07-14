@@ -1,5 +1,5 @@
 --TEST--
-UAMQPConnection() initial state test
+Test general, public API of the extension.
 --SKIPIF--
 <?php
 if (!extension_loaded('uamqp')) {
@@ -55,6 +55,7 @@ print_class(\UAMQP\Connection::class);
 print_class(\UAMQP\Message::class);
 print_class(\UAMQP\Destination::class);
 print_class(\UAMQP\Producer::class);
+print_class(\UAMQP\Consumer::class);
 ?>
 --EXPECT--
 UAMQP\Connection
@@ -82,4 +83,9 @@ UAMQP\Producer
 ------
 UAMQP\Producer::__construct(UAMQP\Connection $message)
 UAMQP\Producer::sendMessage(UAMQP\Message $message) : void
+------
+UAMQP\Consumer
+------
+UAMQP\Consumer::__construct(UAMQP\Connection $message)
+UAMQP\Consumer::listen(callable $callback, UAMQP\Destination $message) : void
 ------

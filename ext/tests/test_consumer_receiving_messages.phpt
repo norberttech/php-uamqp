@@ -1,5 +1,5 @@
 --TEST--
-\UAQMP\Producer() sending message to destination
+General test that is going to send couple of messages into the destination through \UAMQP\Producer and receive them using \UAMQP\Consumer
 --SKIPIF--
 <?php
 if (!extension_loaded('uamqp')) {
