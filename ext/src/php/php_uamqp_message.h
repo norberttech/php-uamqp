@@ -8,10 +8,10 @@ PHP_MINIT_FUNCTION(uamqp_message);
     (uamqp_message_object *)((char *) Z_OBJ_P(obj) - Z_OBJ_P(obj)->handlers->offset)
 
 zend_class_entry *php_uamqp_message_ce(void);
+zend_object *uamqp_message_handler_create(zend_class_entry *ce);
 
 typedef struct _uamqp_message_object {
     zend_string *payload;
-    zend_string *destination;
     zend_object zendObject;
 } uamqp_message_object;
 

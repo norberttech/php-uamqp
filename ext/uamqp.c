@@ -8,8 +8,10 @@
 #include "ext/standard/info.h"
 #include "php_uamqp.h"
 #include "src/php/php_uamqp_connection.h"
+#include "src/php/php_uamqp_destination.h"
 #include "src/php/php_uamqp_message.h"
 #include "src/php/php_uamqp_producer.h"
+#include "src/php/php_uamqp_consumer.h"
 
 PHP_RINIT_FUNCTION(uamqp)
 {
@@ -31,12 +33,13 @@ static const zend_function_entry uamqp_functions[] = {
     PHP_FE_END
 };
 
-
 static PHP_MINIT_FUNCTION(uamqp)
 {
     PHP_MINIT(uamqp_connection)(INIT_FUNC_ARGS_PASSTHRU);
+    PHP_MINIT(uamqp_destination)(INIT_FUNC_ARGS_PASSTHRU);
     PHP_MINIT(uamqp_message)(INIT_FUNC_ARGS_PASSTHRU);
     PHP_MINIT(uamqp_producer)(INIT_FUNC_ARGS_PASSTHRU);
+    PHP_MINIT(uamqp_consumer)(INIT_FUNC_ARGS_PASSTHRU);
 
     return SUCCESS;
 }

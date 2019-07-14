@@ -53,6 +53,7 @@ function print_class($className) {
 
 print_class(\UAMQP\Connection::class);
 print_class(\UAMQP\Message::class);
+print_class(\UAMQP\Destination::class);
 print_class(\UAMQP\Producer::class);
 ?>
 --EXPECT--
@@ -67,9 +68,13 @@ UAMQP\Connection::policyKey() : string
 ------
 UAMQP\Message
 ------
-UAMQP\Message::__construct(string $payload, string $destination)
+UAMQP\Message::__construct(string $payload)
 UAMQP\Message::payload() : string
-UAMQP\Message::destination() : string
+------
+UAMQP\Destination
+------
+UAMQP\Destination::__construct(string $value)
+UAMQP\Destination::value() : string
 ------
 UAMQP\Producer
 ------

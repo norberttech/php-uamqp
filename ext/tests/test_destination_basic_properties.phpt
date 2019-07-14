@@ -8,8 +8,8 @@ if (!extension_loaded('uamqp')) {
 ?>
 --FILE--
 <?php
-$message = new \UAMQP\Message("This is sample message payload");
-var_dump($message->payload());
+$message = new \UAMQP\Destination("destination");
+var_dump($message->value());
 ?>
 --EXPECT--
-string(30) "This is sample message payload"
+string(11) "destination"

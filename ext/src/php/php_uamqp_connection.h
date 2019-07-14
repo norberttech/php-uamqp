@@ -1,5 +1,5 @@
 #include "php_uamqp.h"
-#include "../uamqp/uamqp_message_sender.h"
+#include "../uamqp/uamqp.h"
 
 PHP_MINIT_FUNCTION(uamqp_connection);
 
@@ -15,7 +15,7 @@ typedef struct _uaqmp_connection_object_properties {
 
 typedef struct _uamqp_connection_object {
     uaqmp_connection_object_properties properties;
-    struct uamqp_connection uamqp_connection;
+    struct uamqp uamqp_connection;
     struct uamqp_session uamqp_session;
     zend_object zendObject;
 } uamqp_connection_object;

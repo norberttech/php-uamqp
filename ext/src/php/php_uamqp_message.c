@@ -20,15 +20,13 @@ METHOD(__construct)
     zend_string *destination;
     uamqp_message_object *object;
 
-    ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+    ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
         Z_PARAM_STR_EX(payload, 1, 0)
-        Z_PARAM_STR_EX(destination, 1, 0)
     ZEND_PARSE_PARAMETERS_END();
 
     object = UAMQP_MESSAGE_OBJECT(getThis());
 
     object->payload = payload;
-    object->destination = destination;
 }
 
 METHOD(payload)
@@ -40,18 +38,8 @@ METHOD(payload)
     RETVAL_STR(message->payload);
 }
 
-METHOD(destination)
-{
-    zend_parse_parameters_none();
-
-    uamqp_message_object *message = UAMQP_MESSAGE_OBJECT(getThis());
-
-    RETVAL_STR(message->destination);
-}
-
 ZEND_BEGIN_ARG_INFO_EX(message_construct_arginfo, 0, 0, 1)
     ZEND_ARG_TYPE_INFO(0, payload, IS_STRING, 0)
-    ZEND_ARG_TYPE_INFO(0, destination, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(message_void_string_arginfo, 0, 0, IS_STRING, 0)
@@ -60,7 +48,6 @@ ZEND_END_ARG_INFO()
 zend_function_entry uamqp_message_class_functions[] = {
     ME(__construct, message_construct_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
     ME(payload, message_void_string_arginfo, ZEND_ACC_PUBLIC)
-    ME(destination, message_void_string_arginfo, ZEND_ACC_PUBLIC)
     PHP_FE_END
 };
 
@@ -80,7 +67,6 @@ void uamqp_message_object_handler_free(zend_object *object)
     uamqp_message_object *message = php_uamqp_message_fetch_object(object);
 
     message->payload = NULL;
-    message->destination = NULL;
     zend_object_std_dtor(&message->zendObject);
 }
 
