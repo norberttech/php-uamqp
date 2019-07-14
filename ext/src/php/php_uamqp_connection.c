@@ -44,6 +44,24 @@ METHOD(__construct)
     object->uamqp_session = create_uamqp_session(object->uamqp_connection);
 }
 
+METHOD(enableDebugMode)
+{
+    zend_parse_parameters_none();
+
+    uamqp_connection_object *object = UAMQP_CONNECTION_OBJECT(getThis());
+
+    set_uamqp_connection_debug_mode(object->uamqp_connection, 1);
+}
+
+METHOD(disableDebugMode)
+{
+    zend_parse_parameters_none();
+
+    uamqp_connection_object *object = UAMQP_CONNECTION_OBJECT(getThis());
+
+    set_uamqp_connection_debug_mode(object->uamqp_connection, 0);
+}
+
 METHOD(host)
 {
     zend_parse_parameters_none();
@@ -104,8 +122,13 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(connection_void_long_arginfo, 0, 0, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(connection_void_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
 zend_function_entry uamqp_connection_class_functions[] = {
     ME(__construct, connection_construct_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+    ME(enableDebugMode, connection_void_arginfo, ZEND_ACC_PUBLIC)
+    ME(disableDebugMode, connection_void_arginfo, ZEND_ACC_PUBLIC)
     ME(host, connection_void_string_arginfo, ZEND_ACC_PUBLIC)
     ME(port, connection_void_long_arginfo, ZEND_ACC_PUBLIC)
     ME(useTLS, connection_void_long_arginfo, ZEND_ACC_PUBLIC)

@@ -26,6 +26,7 @@ struct uamqp_message_receiver {
 };
 
 struct uamqp create_uamqp_connection(char *host, int port, char *policyName, char *policyKey);
+void set_uamqp_connection_debug_mode(struct uamqp connection, int enabled);
 struct uamqp_session create_uamqp_session(struct uamqp connection);
 void destroy_connection(struct uamqp *uamqp_connection, struct uamqp_session *uamqp_session);
 

@@ -60,6 +60,8 @@ print_class(\UAMQP\Producer::class);
 UAMQP\Connection
 ------
 UAMQP\Connection::__construct(string $host, int $port, bool $useTLS, string $policyName, string $policyKey)
+UAMQP\Connection::enableDebugMode() : void
+UAMQP\Connection::disableDebugMode() : void
 UAMQP\Connection::host() : string
 UAMQP\Connection::port() : int
 UAMQP\Connection::useTLS() : int

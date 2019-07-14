@@ -40,9 +40,13 @@ struct uamqp create_uamqp_connection(char *host, int port, char *policyName, cha
     tickcounter_destroy(tickCounterHandle);
 
     connection.connection = connection_create(connection.sasl_io, host, "php-uaqmp-binding", NULL, NULL);
-//    connection_set_trace(connection.connection, 1);
 
     return connection;
+}
+
+void set_uamqp_connection_debug_mode(struct uamqp connection, int enabled)
+{
+    connection_set_trace(connection.connection, enabled);
 }
 
 struct uamqp_session create_uamqp_session(struct uamqp connection)
