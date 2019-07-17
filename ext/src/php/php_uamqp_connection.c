@@ -25,20 +25,20 @@ METHOD(__construct)
     uamqp_connection_object *object;
 
     ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 5, 5)
-        Z_PARAM_STR(host)
+        Z_PARAM_STR_EX(host, 1, 0)
         Z_PARAM_LONG(port)
         Z_PARAM_BOOL(useTLS)
-        Z_PARAM_STR(policyName)
-        Z_PARAM_STR(policyKey)
+        Z_PARAM_STR_EX(policyName, 1, 0)
+        Z_PARAM_STR_EX(policyKey, 1, 0)
     ZEND_PARSE_PARAMETERS_END();
 
     object = UAMQP_CONNECTION_OBJECT(getThis());
 
-    object->properties.host = host;
+    object->properties.host = zend_string_copy(host);
     object->properties.port = port;
     object->properties.useTLS = useTLS;
-    object->properties.policyName = policyName;
-    object->properties.policyKey = policyKey;
+    object->properties.policyName = zend_string_copy(policyName);
+    object->properties.policyKey = zend_string_copy(policyKey);
 
     object->uamqp_connection = create_uamqp_connection(ZSTR_VAL(object->properties.host), object->properties.port, ZSTR_VAL(object->properties.policyName), ZSTR_VAL(object->properties.policyKey));
     object->uamqp_session = create_uamqp_session(object->uamqp_connection);

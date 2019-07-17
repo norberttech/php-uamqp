@@ -8,8 +8,13 @@ if (!extension_loaded('uamqp')) {
 ?>
 --FILE--
 <?php
-$message = new \UAMQP\Destination("destination");
-var_dump($message->value());
+$destination = new \UAMQP\Destination("destination_path");
+var_dump($destination->value());
+var_dump($destination);
 ?>
 --EXPECT--
-string(11) "destination"
+string(16) "destination_path"
+object(UAMQP\Destination)#1 (1) {
+  ["destination"]=>
+  string(16) "destination_path"
+}

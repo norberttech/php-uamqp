@@ -1,4 +1,5 @@
 #include <php.h>
+#include <ext/standard/php_var.h>
 #include "../../php_uamqp.h"
 #include "php_uamqp_destination.h"
 
@@ -16,16 +17,16 @@ zend_class_entry *php_uamqp_destination_ce(void)
 
 METHOD(__construct)
 {
-    zend_string *value;
+    zend_string *destination_value;
     uamqp_destination_object *object;
 
     ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-        Z_PARAM_STR_EX(value, 1, 0)
+        Z_PARAM_STR_EX(destination_value, 1, 0)
     ZEND_PARSE_PARAMETERS_END();
 
     object = UAMQP_DESTINATION_OBJECT(getThis());
 
-    object->value = value;
+    object->value = zend_string_copy(destination_value);
 }
 
 METHOD(value)
@@ -69,6 +70,28 @@ void uamqp_destination_object_handler_free(zend_object *object)
     zend_object_std_dtor(&destination->zendObject);
 }
 
+static HashTable* uamqp_destination_object_debug_info(zval *obj, int *is_temp) /* {{{ */
+{
+    uamqp_destination_object *destination = php_uamqp_destination_fetch_object(Z_OBJ_P(obj));
+    HashTable *props;
+    zval tmp;
+    HashTable *debug_info;
+
+    *is_temp = 1;
+
+    props = Z_OBJPROP_P(obj);
+
+    ALLOC_HASHTABLE(debug_info);
+    ZEND_INIT_SYMTABLE_EX(debug_info, zend_hash_num_elements(props) + 1, 0);
+    zend_hash_copy(debug_info, props, (copy_ctor_func_t)zval_add_ref);
+
+    ZVAL_STR(&tmp, destination->value);
+    zend_hash_update(debug_info, zend_string_init("destination", sizeof("destination") - 1, 0), &tmp);
+    zval_dtor(&tmp);
+
+    return debug_info;
+}
+
 PHP_MINIT_FUNCTION(uamqp_destination) {
     zend_class_entry ce;
 
@@ -80,6 +103,7 @@ PHP_MINIT_FUNCTION(uamqp_destination) {
 
     memcpy(&uamqp_destination_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
     uamqp_destination_object_handlers.offset = XtOffsetOf(uamqp_destination_object, zendObject);
+    uamqp_destination_object_handlers.get_debug_info = uamqp_destination_object_debug_info;
     uamqp_destination_object_handlers.free_obj = uamqp_destination_object_handler_free;
 
     return SUCCESS;

@@ -17,7 +17,6 @@ zend_class_entry *php_uamqp_message_ce(void)
 METHOD(__construct)
 {
     zend_string *payload;
-    zend_string *destination;
     uamqp_message_object *object;
 
     ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
@@ -26,7 +25,7 @@ METHOD(__construct)
 
     object = UAMQP_MESSAGE_OBJECT(getThis());
 
-    object->payload = payload;
+    object->payload = zend_string_copy(payload);
 }
 
 METHOD(payload)

@@ -17,7 +17,7 @@ if (!getenv('PHP_UAMQP_TEST_SB_POLICY_NAME')) {
 $connection = new \UAMQP\Connection(getenv('PHP_UAMQP_TEST_SB_HOST'), 5671, true, getenv('PHP_UAMQP_TEST_SB_POLICY_NAME'), getenv('PHP_UAMQP_TEST_SB_POLICY_KEY'));
 
 $producer = new \UAMQP\Producer($connection);
-$destination = new \UAMQP\Destination("testname");
+$destination = new \UAMQP\Destination(getenv('PHP_UAMQP_TEST_SB_DESTINATION'));
 
 $producer->sendMessage(new \UAMQP\Message($payload = "this is some random test message 1 " . time()), $destination);
 $producer->sendMessage(new \UAMQP\Message($payload = "this is some random test message 2 " . time()), $destination);

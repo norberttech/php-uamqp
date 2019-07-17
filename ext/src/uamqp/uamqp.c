@@ -9,7 +9,9 @@
 #include <azure_uamqp_c/sasl_mssbcbs.h>
 #include <azure_uamqp_c/sasl_plain.h>
 #include <azure_uamqp_c/session.h>
+#include <Zend/zend_exceptions.h>
 #include "uamqp.h"
+#include "../php/php_uamqp_exception.h"
 
 struct uamqp create_uamqp_connection(char *host, int port, char *policyName, char *policyKey)
 {
@@ -22,7 +24,7 @@ struct uamqp create_uamqp_connection(char *host, int port, char *policyName, cha
     TICK_COUNTER_HANDLE tickCounterHandle;
 
     if (platform_init() != 0) {
-        // not sure what to do when
+        zend_throw_exception(php_uamqp_exception_ce(), "UAQMP platform already initialized", 0);
     }
 
     // Create TLS IO
@@ -86,10 +88,8 @@ static void on_link_detach_received_producer(void* context, ERROR_HANDLE error)
     const char* description = NULL;
     error_get_condition(error, &condition);
     error_get_description(error, &description);
-    php_printf(condition);
-    php_printf(description);
 
-    // todo: throw php error
+    zend_throw_exception(php_uamqp_exception_ce(), description, 0);
 }
 
 struct uamqp_message_sender create_message_sender(struct uamqp_session uamqp_session, char *host, char *destination)
@@ -115,7 +115,7 @@ struct uamqp_message_sender create_message_sender(struct uamqp_session uamqp_ses
     sender.message_sender = messagesender_create(sender.link, NULL, NULL);
 
     if (sender.message_sender == NULL) {
-        // todo: throw php error
+        zend_throw_exception(php_uamqp_exception_ce(), "Failed to initialize message sender.", 0);
     }
 
     return sender;
@@ -149,7 +149,7 @@ static void on_message_send_complete(void* context, MESSAGE_SEND_RESULT send_res
 void send_message(struct uamqp uamqp_connection, struct uamqp_message_sender uamqp_messag_sender, struct uamqp_message uamqp_message)
 {
     if (messagesender_open(uamqp_messag_sender.message_sender) != 0) {
-        // todo: throw php error
+        zend_throw_exception(php_uamqp_exception_ce(), "Failed to open message sender.", 0);
     }
 
     (void) messagesender_send_async(uamqp_messag_sender.message_sender, uamqp_message.message, on_message_send_complete, uamqp_message.message, 5000);

@@ -12,7 +12,7 @@ if test "$PHP_UAMQP" != "no"; then
     PHP_ADD_INCLUDE([deps/azure-uamqp-c/deps/azure-c-shared-utility/inc])
     PHP_ADD_INCLUDE([deps/azure-uamqp-c/inc])
 
-	PHP_NEW_EXTENSION(uamqp, uamqp.c src/php/php_uamqp_connection.c src/php/php_uamqp_producer.c src/php/php_uamqp_consumer.c src/php/php_uamqp_message.c src/php/php_uamqp_destination.c src/uamqp/uamqp.c, $ext_shared)
+	PHP_NEW_EXTENSION(uamqp, uamqp.c src/php/php_uamqp_connection.c src/php/php_uamqp_exception.c src/php/php_uamqp_producer.c src/php/php_uamqp_consumer.c src/php/php_uamqp_message.c src/php/php_uamqp_destination.c src/uamqp/uamqp.c, $ext_shared)
 
     CFLAGS=" $CFLAGS -Wl,deps/azure-uamqp-c/cmake/deps/umock-c/libumock_c.a"
     CFLAGS=" $CFLAGS -Wl,deps/azure-uamqp-c/cmake/deps/azure-c-shared-utility/libaziotsharedutil.a"
