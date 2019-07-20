@@ -43,10 +43,10 @@ $consumer->listen(function($message) use (&$i) {
 ?>
 --EXPECTF--
 int(1)
-string(44) "this is some random test message %d %d"
+string(%d) "this is some random test message %d %d"
 int(2)
-string(44) "this is some random test message %d %d"
+string(%d) "this is some random test message %d %d"
 int(3)
-string(44) "this is some random test message %d %d"
+string(%d) "this is some random test message %d %d"
 int(4)
-string(44) "this is some random test message %d %d"
+string(%d) "this is some random test message %d %d"

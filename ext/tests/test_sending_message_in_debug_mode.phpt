@@ -22,6 +22,16 @@ $destination = new \UAMQP\Destination(getenv('PHP_UAMQP_TEST_SB_DESTINATION'));
 
 $producer->sendMessage(new \UAMQP\Message($payload = "this is some random test message 1 " . time()), $destination);
 
+
+$consumer = new \UAMQP\Consumer($connection);
+
+$i = 0;
+
+$consumer->listen(function($message) use (&$i) {
+    return false;
+}, $destination);
+
+
 ?>
 --EXPECTF--
 -> Header (AMQP 0.1.0.0)
@@ -35,5 +45,12 @@ $producer->sendMessage(new \UAMQP\Message($payload = "this is some random test m
 <- [FLOW]* {0,5000,1,2147483647,0,0,1000,0,NULL,false,NULL}
 -> [TRANSFER]* {0,0,<01 00 00 00>,0,true,false}
 -> [DETACH]* {0,true}
+-> [ATTACH]* {receiver-link,1,true,0,0,* {amqps://%s},* {ingress-rx},NULL,NULL,NULL,0}
+<- [DETACH]* {0,true,NULL}
+<- [ATTACH]* {receiver-link,0,false,0,1,* {amqps://%s,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL},* {ingress-rx,NULL,NULL,NULL,NULL,NULL,NULL},NULL,NULL,0,18446744073709551615,NULL,NULL,NULL}
+-> [FLOW]* {1,2147483647,1,65535,1,0,10000}
+<- [TRANSFER]* {0,0,<%s>,0,NULL,false,NULL,NULL,NULL,NULL,true}
+-> [DISPOSITION]* {true,0,0,true,* {}}
+-> [DETACH]* {1,true}
 -> [END]* {}
 -> [CLOSE]* {}

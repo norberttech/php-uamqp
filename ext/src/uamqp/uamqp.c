@@ -172,7 +172,7 @@ bool (*receiver_callback_type)(char *msg) = NULL;
 
 static AMQP_VALUE on_message_received(const void* context, MESSAGE_HANDLE message) {
     BINARY_DATA binary_data;
-    char msg[65536] = {};
+    char raw_message[65536] = {};
 
     (void)context;
     (void)message;
@@ -181,9 +181,9 @@ static AMQP_VALUE on_message_received(const void* context, MESSAGE_HANDLE messag
 
         message_get_body_amqp_data_in_place(message, 0, &binary_data);
 
-        strncpy(msg, binary_data.bytes, binary_data.length - 1);
+        strncpy(raw_message, (const char *) binary_data.bytes, binary_data.length);
 
-        if (receiver_callback_type(msg) == true) {
+        if (receiver_callback_type(raw_message) == true) {
             keep_receiving = false;
         }
 

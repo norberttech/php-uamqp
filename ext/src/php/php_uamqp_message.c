@@ -1,6 +1,8 @@
 #include <php.h>
+#include <Zend/zend_exceptions.h>
 #include "../../php_uamqp.h"
 #include "php_uamqp_message.h"
+#include "php_uamqp_exception.h"
 
 zend_class_entry *uamqp_message_ce;
 zend_object_handlers uamqp_message_object_handlers;
@@ -24,6 +26,10 @@ METHOD(__construct)
     ZEND_PARSE_PARAMETERS_END();
 
     object = UAMQP_MESSAGE_OBJECT(getThis());
+
+    if (payload->len > 64500) {
+        zend_throw_exception(php_uamqp_exception_ce(), "Message payload can't be longer than 64500 characters.", 0);
+    }
 
     object->payload = zend_string_copy(payload);
 }
