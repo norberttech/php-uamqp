@@ -34,6 +34,6 @@ struct uamqp_message_sender create_message_sender(struct uamqp_session uamqp_ses
 struct uamqp_message create_message(char *content);
 void send_message(struct uamqp uamqp_connection, struct uamqp_message_sender uamqp_messag_sender, struct uamqp_message uamqp_message);
 
-struct uamqp_message_receiver create_message_receiver(struct uamqp_session uamqp_session, char *host, char *destination, int incoming_window_size);
+struct uamqp_message_receiver create_message_receiver(struct uamqp_session uamqp_session, char *host, char *destination);
 void uamqp_open_receiver(struct uamqp uamqp_connection, struct uamqp_message_receiver uamqp_message_receiver, bool (*callback)(char *msg));
 

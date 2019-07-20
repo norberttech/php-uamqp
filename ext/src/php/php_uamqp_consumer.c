@@ -96,7 +96,7 @@ METHOD(listen)
 
     uamqp_open_receiver(
         object->uamqp_connection->uamqp_connection,
-        create_message_receiver(object->uamqp_connection->uamqp_session, ZSTR_VAL(object->uamqp_connection->properties.host), ZSTR_VAL(destination->value), 1),
+        create_message_receiver(object->uamqp_connection->uamqp_session, ZSTR_VAL(object->uamqp_connection->properties.host), ZSTR_VAL(destination->value)),
         callback
     );
 }

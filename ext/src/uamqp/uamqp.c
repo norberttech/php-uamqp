@@ -193,13 +193,12 @@ static AMQP_VALUE on_message_received(const void* context, MESSAGE_HANDLE messag
     }
 }
 
-struct uamqp_message_receiver create_message_receiver(struct uamqp_session uamqp_session, char *host, char *destination, int incoming_window_size)
+struct uamqp_message_receiver create_message_receiver(struct uamqp_session uamqp_session, char *host, char *destination)
 {
     struct uamqp_message_receiver receiver;
-    LINK_HANDLE link = NULL;
     AMQP_VALUE source;
     AMQP_VALUE target;
-    char uamqpHost[1024];
+    char uamqpHost[2048];
 
     snprintf(uamqpHost, sizeof uamqpHost, "amqps://%s/%s", host, destination);
 
