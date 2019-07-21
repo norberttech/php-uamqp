@@ -2,9 +2,6 @@
 
 ```
 ./init.sh
-phpize
-./configure
-make
 make test
 ```
 
