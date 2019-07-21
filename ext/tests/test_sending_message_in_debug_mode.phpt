@@ -14,7 +14,7 @@ if (!getenv('PHP_UAMQP_TEST_SB_POLICY_NAME')) {
 --FILE--
 <?php
 
-$connection = new \UAMQP\Connection(getenv('PHP_UAMQP_TEST_SB_HOST'), 5671, true, getenv('PHP_UAMQP_TEST_SB_POLICY_NAME'), getenv('PHP_UAMQP_TEST_SB_POLICY_KEY'));
+$connection = new \UAMQP\Connection(getenv('PHP_UAMQP_TEST_SB_HOST'), 5671, getenv('PHP_UAMQP_TEST_SB_POLICY_NAME'), getenv('PHP_UAMQP_TEST_SB_POLICY_KEY'));
 $connection->enableDebugMode();
 
 $producer = new \UAMQP\Producer($connection);

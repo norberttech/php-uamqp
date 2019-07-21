@@ -60,12 +60,11 @@ print_class(\UAMQP\Consumer::class);
 --EXPECT--
 UAMQP\Connection
 ------
-UAMQP\Connection::__construct(string $host, int $port, bool $useTLS, string $policyName, string $policyKey)
+UAMQP\Connection::__construct(string $host, int $port, string $policyName, string $policyKey)
 UAMQP\Connection::enableDebugMode() : void
 UAMQP\Connection::disableDebugMode() : void
 UAMQP\Connection::host() : string
 UAMQP\Connection::port() : int
-UAMQP\Connection::useTLS() : int
 UAMQP\Connection::policyName() : string
 UAMQP\Connection::policyKey() : string
 ------

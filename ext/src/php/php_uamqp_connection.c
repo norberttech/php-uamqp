@@ -20,14 +20,12 @@ METHOD(__construct)
 {
     zend_string *host, *policyName, *policyKey;
     zend_long port;
-    zend_bool useTLS;
 
     uamqp_connection_object *object;
 
-    ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 5, 5)
+    ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 4, 4)
         Z_PARAM_STR_EX(host, 1, 0)
         Z_PARAM_LONG(port)
-        Z_PARAM_BOOL(useTLS)
         Z_PARAM_STR_EX(policyName, 1, 0)
         Z_PARAM_STR_EX(policyKey, 1, 0)
     ZEND_PARSE_PARAMETERS_END();
@@ -36,7 +34,6 @@ METHOD(__construct)
 
     object->properties.host = zend_string_copy(host);
     object->properties.port = port;
-    object->properties.useTLS = useTLS;
     object->properties.policyName = zend_string_copy(policyName);
     object->properties.policyKey = zend_string_copy(policyKey);
 
@@ -81,14 +78,6 @@ METHOD(port)
     RETVAL_LONG((int) object->properties.port);
 }
 
-METHOD(useTLS)
-{
-    zend_parse_parameters_none();
-
-    uamqp_connection_object *object = UAMQP_CONNECTION_OBJECT(getThis());
-
-    RETVAL_BOOL(object->properties.useTLS);
-}
 
 METHOD(policyName)
 {
@@ -108,10 +97,9 @@ METHOD(policyKey)
     RETVAL_STR(object->properties.policyKey);
 }
 
-ZEND_BEGIN_ARG_INFO_EX(connection_construct_arginfo, 0, 0, 5)
+ZEND_BEGIN_ARG_INFO_EX(connection_construct_arginfo, 0, 0, 4)
     ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, port, IS_LONG, 0)
-    ZEND_ARG_TYPE_INFO(0, useTLS, _IS_BOOL, 0)
     ZEND_ARG_TYPE_INFO(0, policyName, IS_STRING, 0)
     ZEND_ARG_TYPE_INFO(0, policyKey, IS_STRING, 0)
 ZEND_END_ARG_INFO()
@@ -131,7 +119,6 @@ zend_function_entry uamqp_connection_class_functions[] = {
     ME(disableDebugMode, connection_void_arginfo, ZEND_ACC_PUBLIC)
     ME(host, connection_void_string_arginfo, ZEND_ACC_PUBLIC)
     ME(port, connection_void_long_arginfo, ZEND_ACC_PUBLIC)
-    ME(useTLS, connection_void_long_arginfo, ZEND_ACC_PUBLIC)
     ME(policyName, connection_void_string_arginfo, ZEND_ACC_PUBLIC)
     ME(policyKey, connection_void_string_arginfo, ZEND_ACC_PUBLIC)
     PHP_FE_END
