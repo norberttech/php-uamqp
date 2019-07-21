@@ -50,7 +50,7 @@ UAMQP\Destination::value() : string
 
 ```
 UAMQP\Producer::__construct(UAMQP\Connection $message)
-UAMQP\Producer::sendMessage(UAMQP\Message $message) : void
+UAMQP\Producer::sendMessage(UAMQP\Message $message, UAMQP\Destination $destination) : void
 ```
 
 ### UAMQP\Consumer

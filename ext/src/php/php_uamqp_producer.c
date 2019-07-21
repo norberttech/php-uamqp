@@ -67,8 +67,9 @@ ZEND_BEGIN_ARG_INFO_EX(producer_construct_arginfo, 0, 0, 1)
     ZEND_ARG_OBJ_INFO(0, message, UAMQP\\Connection, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(producer_sendMessage_arginfo, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(producer_sendMessage_arginfo, 0, 0, 2)
     ZEND_ARG_OBJ_INFO(0, message, UAMQP\\Message, 0)
+    ZEND_ARG_OBJ_INFO(0, destination, UAMQP\\Destination, 0)
 ZEND_END_ARG_INFO()
 
 zend_function_entry uamqp_producer_class_functions[] = {
