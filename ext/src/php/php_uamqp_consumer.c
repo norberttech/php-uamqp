@@ -47,16 +47,35 @@ bool callback(char *msg)
 {
     zval callback_result, callback_argument;
     int callback_return;
+    zval message_object, constructor_name, constructor_args[1], constructor_result;
 
-    listen_method_callback.retval = &callback_result;
+    // create function name for call_user_function
+    ZVAL_STRING(&constructor_name, ZEND_CONSTRUCTOR_FUNC_NAME);
+
+    // initialize value (zval) of first constructor argument from string
+    ZVAL_STRING(&constructor_args[0], msg);
+
+    //Initialize UAMQP\Message object
+    object_init_ex(&message_object, php_uamqp_message_ce());
+
+    // execute UAMQP\Message object constructor
+    call_user_function(NULL, &message_object, &constructor_name, &constructor_result, 1, constructor_args);
+
+    // Prepare callback
     listen_method_callback.param_count = 1;
-    listen_method_callback.params = &callback_argument;
+    listen_method_callback.params = &message_object;
     listen_method_callback.no_separation = 0;
+    listen_method_callback.retval = &callback_result;
 
-    ZVAL_NEW_STR(&callback_argument, zend_string_init(msg, strlen(msg), 0));
-
+    // call listener callback with message object passed as first argument
     callback_return = zend_call_function(&listen_method_callback, &listen_method_callback_cache);
+
+    // cleanup
     i_zval_ptr_dtor(&callback_argument ZEND_FILE_LINE_CC);
+    zval_ptr_dtor(&message_object);
+    zval_ptr_dtor(&constructor_name);
+    zval_ptr_dtor(&constructor_args[0]);
+    zval_ptr_dtor(&constructor_result);
 
     // stop next message consumption if exception
     if (EG(exception)) {

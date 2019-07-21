@@ -28,7 +28,7 @@ $consumer = new \UAMQP\Consumer($connection);
 
 $i = 0;
 
-$consumer->listen(function($message) use (&$i) {
+$consumer->listen(function(\UAMQP\Message $message) use (&$i) {
     $i++;
 
     var_dump($i, $message);
@@ -43,10 +43,22 @@ $consumer->listen(function($message) use (&$i) {
 ?>
 --EXPECTF--
 int(1)
-string(%d) "this is some random test message %d %d"
+object(UAMQP\Message)#%d (1) {
+  ["payload"]=>
+  string(%d) "this is some random test message %d %d"
+}
 int(2)
-string(%d) "this is some random test message %d %d"
+object(UAMQP\Message)#%d (1) {
+  ["payload"]=>
+  string(%d) "this is some random test message %d %d"
+}
 int(3)
-string(%d) "this is some random test message %d %d"
+object(UAMQP\Message)#%d (1) {
+  ["payload"]=>
+  string(%d) "this is some random test message %d %d"
+}
 int(4)
-string(%d) "this is some random test message %d %d"
+object(UAMQP\Message)#%d (1) {
+  ["payload"]=>
+  string(%d) "this is some random test message %d %d"
+}
