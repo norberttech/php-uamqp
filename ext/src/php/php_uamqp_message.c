@@ -71,27 +71,31 @@ void uamqp_message_object_handler_free(zend_object *object)
 {
     uamqp_message_object *message = php_uamqp_message_fetch_object(object);
 
-    message->payload = NULL;
+    zend_string_release(message->payload);
     zend_object_std_dtor(&message->zendObject);
 }
 
-static HashTable* uamqp_destination_object_debug_info(zval *obj, int *is_temp) /* {{{ */
+void uamqp_message_object_handler_destroy(zend_object *object)
 {
-    uamqp_message_object *destination = php_uamqp_message_fetch_object(Z_OBJ_P(obj));
-    HashTable *props;
+    zend_objects_destroy_object(object);
+}
+
+static HashTable* uamqp_message_object_debug_info(zval *obj, int *is_temp)
+{
+    uamqp_message_object *message = php_uamqp_message_fetch_object(Z_OBJ_P(obj));
     zval tmp;
+    zend_string *payload_key;
     HashTable *debug_info;
 
     *is_temp = 1;
 
-    props = Z_OBJPROP_P(obj);
-
     ALLOC_HASHTABLE(debug_info);
-    ZEND_INIT_SYMTABLE_EX(debug_info, zend_hash_num_elements(props) + 1, 0);
-    zend_hash_copy(debug_info, props, (copy_ctor_func_t)zval_add_ref);
+    zend_hash_init(debug_info, 1, NULL, ZVAL_PTR_DTOR, 0);
 
-    ZVAL_STR(&tmp, destination->payload);
-    zend_hash_update(debug_info, zend_string_init("payload", sizeof("payload") - 1, 0), &tmp);
+    ZVAL_STR(&tmp, message->payload);
+    payload_key = zend_string_init("payload", sizeof("payload") - 1, 0);
+    zend_hash_update(debug_info, payload_key, &tmp);
+    zend_string_release(payload_key);
     zval_dtor(&tmp);
 
     return debug_info;
@@ -108,7 +112,8 @@ PHP_MINIT_FUNCTION(uamqp_message) {
 
     memcpy(&uamqp_message_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
     uamqp_message_object_handlers.offset = XtOffsetOf(uamqp_message_object, zendObject);
-    uamqp_message_object_handlers.get_debug_info = uamqp_destination_object_debug_info;
+    uamqp_message_object_handlers.get_debug_info = uamqp_message_object_debug_info;
+    uamqp_message_object_handlers.dtor_obj = uamqp_message_object_handler_destroy;
     uamqp_message_object_handlers.free_obj = uamqp_message_object_handler_free;
 
     return SUCCESS;

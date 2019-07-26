@@ -45,7 +45,7 @@ METHOD(__construct)
 
 bool callback(char *msg)
 {
-    zval callback_result, callback_argument;
+    zval callback_result;
     int callback_return;
     zval message_object, constructor_name, constructor_args[1], constructor_result;
 
@@ -71,11 +71,11 @@ bool callback(char *msg)
     callback_return = zend_call_function(&listen_method_callback, &listen_method_callback_cache);
 
     // cleanup
-    i_zval_ptr_dtor(&callback_argument ZEND_FILE_LINE_CC);
-    zval_ptr_dtor(&message_object);
-    zval_ptr_dtor(&constructor_name);
-    zval_ptr_dtor(&constructor_args[0]);
-    zval_ptr_dtor(&constructor_result);
+    zval_dtor(&message_object);
+    zval_dtor(&constructor_name);
+    zval_dtor(&constructor_args[0]);
+    zval_dtor(&constructor_result);
+    zval_dtor(&callback_result);
 
     // stop next message consumption if exception
     if (EG(exception)) {

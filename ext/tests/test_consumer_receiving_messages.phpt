@@ -28,7 +28,7 @@ $consumer = new \UAMQP\Consumer($connection);
 
 $i = 0;
 
-$consumer->listen(function(\UAMQP\Message $message) use (&$i) {
+$consumer->listen(function($message) use (&$i) {
     $i++;
 
     var_dump($i, $message);

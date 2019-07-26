@@ -66,27 +66,26 @@ void uamqp_destination_object_handler_free(zend_object *object)
 {
     uamqp_destination_object *destination = php_uamqp_destination_fetch_object(object);
 
-    destination->value = NULL;
+    zend_string_release(destination->value);
     zend_object_std_dtor(&destination->zendObject);
 }
 
-static HashTable* uamqp_destination_object_debug_info(zval *obj, int *is_temp) /* {{{ */
+static HashTable* uamqp_destination_object_debug_info(zval *obj, int *is_temp)
 {
     uamqp_destination_object *destination = php_uamqp_destination_fetch_object(Z_OBJ_P(obj));
-    HashTable *props;
     zval tmp;
+    zend_string *destination_key;
     HashTable *debug_info;
 
     *is_temp = 1;
 
-    props = Z_OBJPROP_P(obj);
-
     ALLOC_HASHTABLE(debug_info);
-    ZEND_INIT_SYMTABLE_EX(debug_info, zend_hash_num_elements(props) + 1, 0);
-    zend_hash_copy(debug_info, props, (copy_ctor_func_t)zval_add_ref);
+    zend_hash_init(debug_info, 1, NULL, ZVAL_PTR_DTOR, 0);
 
     ZVAL_STR(&tmp, destination->value);
-    zend_hash_update(debug_info, zend_string_init("destination", sizeof("destination") - 1, 0), &tmp);
+    destination_key = zend_string_init("destination", sizeof("destination") - 1, 0);
+    zend_hash_update(debug_info, destination_key, &tmp);
+    zend_string_release(destination_key);
     zval_dtor(&tmp);
 
     return debug_info;
