@@ -40,5 +40,5 @@ jobs:
           PHP_UAMQP_TEST_SB_DESTINATION: ${{ secrets.PHP_UAMQP_TEST_SB_DESTINATION }}
       - name: Dump outptup from failed tests
         if: failure()
-        uses: find . -name "*.out" -type f -exec cat {} \;
+        run: find . -name "*.out" -type f -exec cat {} \;
         working-directory: ./ext/tests
