@@ -25,6 +25,8 @@ jobs:
         run: sudo apt-get install libcurl4-openssl-dev
       - name: Install libssl-dev
         run: sudo apt-get install libssl-dev
+      - name: Install uuid-dev
+        run: sudo apt-get install uuid-dev
       - name: Initialize extension
         working-directory: ./ext
         run: ./bin/init.sh
