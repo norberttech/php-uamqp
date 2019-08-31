@@ -13,6 +13,15 @@
 #include "uamqp.h"
 #include "../php/php_uamqp_exception.h"
 
+static void on_connection_closed_received(void* context, ERROR_HANDLE error)
+{
+    (void) context;
+    const char* description = NULL;
+    error_get_description(error, &description);
+
+    zend_throw_exception(php_uamqp_exception_ce(), description, 0);
+}
+
 struct uamqp create_uamqp_connection(char *host, int port, char *policyName, char *policyKey)
 {
     struct uamqp connection;
@@ -21,7 +30,6 @@ struct uamqp create_uamqp_connection(char *host, int port, char *policyName, cha
     TLSIO_CONFIG tls_io_config = { host, port };
     SASLCLIENTIO_CONFIG sasl_io_config;
     SASL_PLAIN_CONFIG sasl_plain_config = {policyName, policyKey, NULL };
-    TICK_COUNTER_HANDLE tickCounterHandle;
 
     if (platform_init() != 0) {
         zend_throw_exception(php_uamqp_exception_ce(), "UAQMP platform already initialized", 0);
@@ -37,11 +45,13 @@ struct uamqp create_uamqp_connection(char *host, int port, char *policyName, cha
     sasl_io_config.sasl_mechanism = connection.sasl_mechanism_handle;
     connection.sasl_io = xio_create(saslclientio_get_interface_description(), &sasl_io_config);
 
-    // create connection
-    tickCounterHandle = tickcounter_create();
-    tickcounter_destroy(tickCounterHandle);
+    if (connection.sasl_io == NULL) {
+        zend_throw_exception(php_uamqp_exception_ce(), "Connection SASL IO Error", 0);
+    }
 
     connection.connection = connection_create(connection.sasl_io, host, "php-uaqmp-binding", NULL, NULL);
+
+    (void) connection_subscribe_on_connection_close_received(connection.connection, on_connection_closed_received, NULL);
 
     return connection;
 }
