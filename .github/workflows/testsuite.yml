@@ -19,6 +19,8 @@ jobs:
         run: php -i
       - name: Update submodules
         run: git submodule update --init --recursive
+      - name: Install curl
+        run: sudo apt-get install curl
       - name: Initialize extension
         working-directory: ./ext
         run: ./bin/init.sh

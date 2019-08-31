@@ -16,9 +16,6 @@
       - "php{{ php7_version }}-cli"
       - "php{{ php7_version }}-dev"
 
-    azure_c_shared_utility_dir: "/home/vagrant/azure-c-shared-utility"
-    azure_uamqp_c_dir: "/home/vagrant/azure-uamqp-c"
-
   tasks:
     - name: install basic tools required to compile php
       package:
@@ -44,5 +41,6 @@
         - "uuid-dev"
       tags: ["tools", "azure-uamqp-c"]
 
-- { role: "iroquoisorg.env" }
-    - { role: "iroquoisorg.php7" }#  roles:
+  roles:
+    - { role: "iroquoisorg.env" }
+    - { role: "iroquoisorg.php7" }
