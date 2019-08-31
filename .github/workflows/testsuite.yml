@@ -34,10 +34,10 @@ jobs:
         working-directory: ./ext
         run: make test
         env:
-          PHP_UAMQP_TEST_SB_HOST: ${{ secrets.PHP_UAMQP_TEST_SB_HOST }}
-          PHP_UAMQP_TEST_SB_POLICY_KEY: ${{ secrets.PHP_UAMQP_TEST_SB_POLICY_KEY }}
-          PHP_UAMQP_TEST_SB_POLICY_NAME: ${{ secrets.PHP_UAMQP_TEST_SB_POLICY_NAME }}
-          PHP_UAMQP_TEST_SB_DESTINATION: ${{ secrets.PHP_UAMQP_TEST_SB_DESTINATION }}
+          PHP_UAMQP_TEST_SB_HOST: ${{ secrets.ENV_PHP_UAMQP_TEST_SB_HOST }}
+          PHP_UAMQP_TEST_SB_POLICY_KEY: ${{ secrets.ENV_PHP_UAMQP_TEST_SB_POLICY_KEY }}
+          PHP_UAMQP_TEST_SB_POLICY_NAME: ${{ secrets.ENV_PHP_UAMQP_TEST_SB_POLICY_NAME }}
+          PHP_UAMQP_TEST_SB_DESTINATION: ${{ secrets.ENV_PHP_UAMQP_TEST_SB_DESTINATION }}
       - name: Dump outptup from failed tests
         if: failure()
         run: find . -name "*.out" -type f -exec cat {} \;
