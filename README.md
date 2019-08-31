@@ -8,9 +8,9 @@ This extensions bring to php bindings for [Azure uAMQP C Library](https://github
 Download repository and then initialize submodules (dependencies)
 
 ```
-git clone git@github.com:norzechowicz/php-uamqp.git
+git clone git@github.com:norzechowicz/php-uamqp.git --recursive
 cd php-uamqp
-git submodule init && git submodule update --recursive
+git submodule update --init --recursive 
 ```
 
 [cd ./ext](/ext)
