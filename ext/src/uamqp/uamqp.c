@@ -53,6 +53,9 @@ struct uamqp create_uamqp_connection(char *host, int port, char *policyName, cha
 
     (void) connection_subscribe_on_connection_close_received(connection.connection, on_connection_closed_received, NULL);
 
+    TICK_COUNTER_HANDLE tick_counter = tickcounter_create();
+    tickcounter_destroy(tick_counter);
+
     return connection;
 }
 
