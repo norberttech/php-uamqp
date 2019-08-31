@@ -19,9 +19,9 @@ jobs:
         run: php -i
       - name: Install submodules
         run: git submodule init && git submodule update --recursive
-      - name: Clean old build
-        working-directory: ./ext
-        run: ./bin/clean.sh
       - name: Initialize extension
         working-directory: ./ext
-        run: ./bin/clean.sh
+        run: ./bin/init.sh
+      - name: Build extension & run testsuite
+        working-directory: ./ext
+        run: make test
