@@ -18,7 +18,9 @@ jobs:
       - name: Dump php info
         run: php -i
       - name: Install submodules
-        run: git submodule init && git submodule update --recursive
+        run: git submodule init
+      - name: Update all submodules
+        run: git submodule update --recursive
       - name: Initialize extension
         working-directory: ./ext
         run: ./bin/init.sh
