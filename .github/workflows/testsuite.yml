@@ -38,3 +38,7 @@ jobs:
           PHP_UAMQP_TEST_SB_POLICY_KEY: ${{ secrets.PHP_UAMQP_TEST_SB_POLICY_KEY }}
           PHP_UAMQP_TEST_SB_POLICY_NAME: ${{ secrets.PHP_UAMQP_TEST_SB_POLICY_NAME }}
           PHP_UAMQP_TEST_SB_DESTINATION: ${{ secrets.PHP_UAMQP_TEST_SB_DESTINATION }}
+      - name: Dump outptup from failed tests
+        if: failure()
+        uses: find . -name "*.out" -type f -exec cat {} \;
+        working-directory: ./ext/tests
