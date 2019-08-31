@@ -1,0 +1,25 @@
+name: Github CI
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Run Full Testsuite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Dump php extensions
+        run: php -m
+      - name: Dump php version
+        run: php -v
+      - name: Dump php info
+        run: php -i
+      - name: Install submodules
+        run: git submodule init && git submodule update --recursive
+      - name: Clean old build
+        working-directory: ./ext/bin/
+        run: ./clean.sh
+
