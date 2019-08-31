@@ -20,7 +20,7 @@ jobs:
       - name: Update submodules
         run: git submodule update --init --recursive
       - name: Install curl
-        run: sudo apt-get install curl
+        run: apt-get install curl
       - name: Initialize extension
         working-directory: ./ext
         run: ./bin/init.sh
