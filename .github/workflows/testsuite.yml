@@ -33,3 +33,8 @@ jobs:
       - name: Build extension & run testsuite
         working-directory: ./ext
         run: make test
+        env:
+          PHP_UAMQP_TEST_SB_HOST: ${{ secrets.PHP_UAMQP_TEST_SB_HOST }}
+          PHP_UAMQP_TEST_SB_POLICY_KEY: ${{ secrets.PHP_UAMQP_TEST_SB_POLICY_KEY }}
+          PHP_UAMQP_TEST_SB_POLICY_NAME: ${{ secrets.PHP_UAMQP_TEST_SB_POLICY_NAME }}
+          PHP_UAMQP_TEST_SB_DESTINATION: ${{ secrets.PHP_UAMQP_TEST_SB_DESTINATION }}
