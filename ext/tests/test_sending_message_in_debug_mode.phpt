@@ -10,6 +10,10 @@ if (!getenv('PHP_UAMQP_TEST_SB_POLICY_NAME')) {
     echo 'skip';
 }
 
+if ((int) getenv('PHP_UAMQP_TEST_FUNCTIONAL_SKIP') === 1) {
+    echo 'skip';
+}
+
 ?>
 --FILE--
 <?php

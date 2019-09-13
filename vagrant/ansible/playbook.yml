@@ -12,6 +12,12 @@
     env_timezone: "UTC"
     env_vars:
       PHP_UAMQP_PHP_EXECUTABLE: "{{ uamqpphp_php_bin }}/bin"
+      PHP_UAMQP_TEST_SB_HOST: "{{ uamqp_host }}"
+      PHP_UAMQP_TEST_SB_POLICY_NAME: "{{ uamqp_policy }}"
+      PHP_UAMQP_TEST_SB_POLICY_KEY: "{{ uamqp_key }}"
+      PHP_UAMQP_TEST_SB_DESTINATION: "{{ uamqp_destination }}"
+      NO_INTERACTION: 1
+      PHP_UAMQP_TEST_FUNCTIONAL_SKIP: "{{ test_skip_functional }}"
 
   tasks:
     - debug:
@@ -59,6 +65,7 @@
         repo: 'https://github.com/php/php-src.git'
         dest: "{{ uamqpphp_php_src }}"
         version: "{{ uamqpphp_php_version }}"
+        force: yes
       tags: ["tools", "php"]
 
     - name: PHP Build Config
