@@ -19,6 +19,8 @@ jobs:
         run: php -i
       - name: Update submodules
         run: git submodule update --init --recursive
+      - name: Update
+        run: sudo apt-get update
       - name: Install curl
         run: sudo apt-get install curl
       - name: Install libcurl4-openssl-dev
