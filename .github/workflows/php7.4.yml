@@ -26,7 +26,7 @@ jobs:
 
       - name: Checkout to PHP 7.4.0
         working-directory: ./ext/php-build/php-src
-        run: git checkout PHP-7.4.0beta4
+        run: git checkout PHP-7.4
 
       - name: Build PHP Config
         working-directory: ./ext/php-build/php-src
