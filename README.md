@@ -2,6 +2,9 @@
 
 This extensions bring to php bindings for [Azure uAMQP C Library](https://github.com/Azure/azure-uamqp-c), a general purpose C library for AMQP 1.0.
 
+## PHP Minimum Version
+
+PHP 7.3+ 
 
 ## Development
 
