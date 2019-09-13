@@ -108,6 +108,6 @@ $callback = function(UAMQP\Message $message) {
 }
 
 $callback = function(UAMQP\Message $message) {
-    throw new \RuntimeException(); // UAMQP\Receiver::PEAK_AND_LOCK - reject message and not receive more, exception message will be error description for dead letter
+    throw new \RuntimeException(); // UAMQP\Receiver::PEAK_AND_LOCK - rlease message and not receive more
 }
 ```
