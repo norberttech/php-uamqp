@@ -5,7 +5,8 @@ cd ./deps/azure-uamqp-c/cmake
 cmake ..
 cmake --build .
 cd ./../../..
-if [[ -z "$PHP_UAMQP_PHP_EXECUTABLE" ]]; then
+
+if [[ -z "${PHP_UAMQP_PHP_EXECUTABLE}" ]]; then
     echo "PHP_UAMQP_PHP_EXECUTABLE not found, trying to use php from PATH"
 
     phpize
