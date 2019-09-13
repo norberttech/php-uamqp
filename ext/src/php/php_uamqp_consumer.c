@@ -2,10 +2,13 @@
 #include <string.h>
 #include <ext/standard/php_var.h>
 #include <Zend/zend_interfaces.h>
+#include <Zend/zend_exceptions.h>
 #include "php_uamqp_producer.h"
 #include "php_uamqp_connection.h"
 #include "php_uamqp_message.h"
 #include "php_uamqp_destination.h"
+#include "php_uamqp_consumer.h"
+#include "php_uamqp_exception.h"
 
 #define PHP_UAMQP_CONSUMER_CLASS "Consumer"
 
@@ -15,6 +18,12 @@
 #define UAMQP_CONSUMER_OBJECT(obj) \
     (uamqp_consumer_object *)((char *) Z_OBJ_P(obj) - Z_OBJ_P(obj)->handlers->offset)
 
+static const int RECEIVER_RECEIVE_AND_DELETE = 0;
+static const int RECEIVER_PEAK_AND_LOCK = 1;
+static const int RECEIVER_ACCEPT_NEXT = 2;
+static const int RECEIVER_STOP = 3;
+static const int RECEIVER_ACCEPT_STOP = 4;
+
 zend_class_entry *uamqp_consumer_ce;
 zend_object_handlers uamqp_consumer_object_handlers;
 
@@ -23,6 +32,7 @@ zend_fcall_info_cache listen_method_callback_cache;
 
 typedef struct _uamqp_consumer_object {
     uamqp_connection_object *uamqp_connection;
+    int settle_mode;
     zend_object zendObject;
 } uamqp_consumer_object;
 
@@ -33,33 +43,32 @@ static inline uamqp_consumer_object *php_uamqp_consumer_fetch_object(zend_object
 METHOD(__construct)
 {
     zval *connection_argument;
+    zend_long settle_mode_argument;
 
-    ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1);
+    ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2);
         Z_PARAM_OBJECT_OF_CLASS_EX(connection_argument, php_uamqp_connection_ce(), 1, 0);
+        Z_PARAM_LONG(settle_mode_argument);
     ZEND_PARSE_PARAMETERS_END();
 
     uamqp_consumer_object *object = UAMQP_CONSUMER_OBJECT(getThis());
 
     object->uamqp_connection = UAMQP_CONNECTION_OBJECT(connection_argument);
+    object->settle_mode = (int) settle_mode_argument;
 }
 
-bool callback(char *msg)
+int callback(char *msg)
 {
-    zval callback_result;
     int callback_return;
-    zval message_object, constructor_name, constructor_args[1], constructor_result;
+    zval message_object, constructor_arg, constructor_result, callback_result;
 
-    // create function name for call_user_function
-    ZVAL_STRING(&constructor_name, ZEND_CONSTRUCTOR_FUNC_NAME);
-
-    // initialize value (zval) of first constructor argument from string
-    ZVAL_STRING(&constructor_args[0], msg);
+    // initialize value (zval) of Message object constructor argument from string
+    ZVAL_STRING(&constructor_arg, msg);
 
     //Initialize UAMQP\Message object
     object_init_ex(&message_object, php_uamqp_message_ce());
 
     // execute UAMQP\Message object constructor
-    call_user_function(NULL, &message_object, &constructor_name, &constructor_result, 1, constructor_args);
+    zend_call_method_with_1_params(&message_object, php_uamqp_message_ce(), &php_uamqp_message_ce()->constructor, "__construct", &constructor_result, &constructor_arg);
 
     // Prepare callback
     listen_method_callback.param_count = 1;
@@ -72,28 +81,50 @@ bool callback(char *msg)
 
     // cleanup
     zval_dtor(&message_object);
-    zval_dtor(&constructor_name);
-    zval_dtor(&constructor_args[0]);
+    zval_dtor(&constructor_arg);
     zval_dtor(&constructor_result);
-    zval_dtor(&callback_result);
 
     // stop next message consumption if exception
     if (EG(exception)) {
-        return true;
+        zval_dtor(&callback_result);
+
+        return RECEIVER_STOP;
     }
 
     // stop next message consumption if callback did not returned SUCCESS
     if (callback_return != SUCCESS || Z_TYPE(callback_result) == IS_UNDEF) {
-        return false;
+        zval_dtor(&callback_result);
+
+        return RECEIVER_STOP;
     }
 
     // do not stop message consumption if callback returned true
-    if (Z_TYPE(callback_result) == IS_TRUE) {
-        return false;
+    if (Z_TYPE(callback_result) == IS_LONG) {
+        int result = Z_LVAL(callback_result);
+        zval_dtor(&callback_result);
+
+        if (result < RECEIVER_ACCEPT_NEXT || result > RECEIVER_ACCEPT_STOP) {
+            zend_throw_exception(php_uamqp_exception_ce(), "Invalid consumer callback return.", 0);
+        }
+
+        return result;
     }
 
+    if (Z_TYPE(callback_result) == IS_TRUE) {
+
+        return RECEIVER_ACCEPT_NEXT;
+    }
+
+
+    if (Z_TYPE(callback_result) == IS_FALSE) {
+
+        return RECEIVER_STOP;
+    }
+
+
+    zval_dtor(&callback_result);
     // stop message consumption, callback did not return anything or returned false
-    return true;
+    return RECEIVER_STOP;
 }
 
 METHOD(listen)
@@ -115,13 +146,14 @@ METHOD(listen)
 
     uamqp_open_receiver(
         object->uamqp_connection->uamqp_connection,
-        create_message_receiver(object->uamqp_connection->uamqp_session, ZSTR_VAL(object->uamqp_connection->properties.host), ZSTR_VAL(destination->value)),
+        create_message_receiver(object->uamqp_connection->uamqp_session, ZSTR_VAL(object->uamqp_connection->properties.host), ZSTR_VAL(destination->value), object->settle_mode),
         callback
     );
 }
 
-ZEND_BEGIN_ARG_INFO_EX(consumer_construct_arginfo, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(consumer_construct_arginfo, 0, 0, 2)
     ZEND_ARG_OBJ_INFO(0, message, UAMQP\\Connection, 0)
+    ZEND_ARG_TYPE_INFO(0, settleMode, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(consumer_listen_arginfo, 0, 0, 2)
@@ -162,6 +194,13 @@ PHP_MINIT_FUNCTION(uamqp_consumer) {
     ce_consumer.create_object = uamqp_consumer_handler_create;
 
     uamqp_consumer_ce = zend_register_internal_class(&ce_consumer);
+
+    zend_declare_class_constant_long(uamqp_consumer_ce, ZEND_STRL("RECEIVE_AND_DELETE"), RECEIVER_RECEIVE_AND_DELETE);
+    zend_declare_class_constant_long(uamqp_consumer_ce, ZEND_STRL("PEAK_AND_LOCK"), RECEIVER_PEAK_AND_LOCK);
+
+    zend_declare_class_constant_long(uamqp_consumer_ce, ZEND_STRL("ACCEPT_NEXT"), RECEIVER_ACCEPT_NEXT);
+    zend_declare_class_constant_long(uamqp_consumer_ce, ZEND_STRL("STOP"), RECEIVER_STOP);
+    zend_declare_class_constant_long(uamqp_consumer_ce, ZEND_STRL("ACCEPT_STOP"), RECEIVER_ACCEPT_STOP);
 
     memcpy(&uamqp_consumer_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
     uamqp_consumer_object_handlers.offset = XtOffsetOf(uamqp_consumer_object, zendObject);

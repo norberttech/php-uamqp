@@ -4,19 +4,19 @@
   become: yes
   remote_user: vagrant
   vars:
+    uamqpphp_php_bin: "/home/vagrant/php-bin"
+    uamqpphp_php_ini: "/home/vagrant/php-ini"
+    uamqpphp_php_src: "/home/vagrant/php-src"
+    uamqpphp_php_version: "PHP-{{ php_version }}"
+
     env_timezone: "UTC"
-
-    php_ini_lines:
-      - 'date.timezone = "UTC"'
-      - 'display_errors = On'
-      - 'short_open_tag = 0'
-
-    php_version: "7.2"
-    php_extensions:
-      - "php{{ php7_version }}-cli"
-      - "php{{ php7_version }}-dev"
+    env_vars:
+      PHP_UAMQP_PHP_EXECUTABLE: "{{ uamqpphp_php_bin }}/bin"
 
   tasks:
+    - debug:
+        msg: "PHP Version: {{ uamqpphp_php_version }}"
+
     - name: install basic tools required to compile php
       package:
         state: present
@@ -25,7 +25,71 @@
         - "gcc"
         - "make"
         - "autoconf"
-      tags: ["tools"]
+        - "bison"
+        - "re2c"
+        - "pkg-config"
+        - "libxml2-dev"
+        - "sqlite3"
+        - "libsqlite3-dev"
+      tags: ["tools", "php"]
+
+    - name: Register PHP binary variable
+      stat:
+        path: "{{ uamqpphp_php_bin }}/bin/php"
+      register: php_bin
+
+    - name: Clone php repository
+      git:
+        repo: 'https://github.com/php/php-src.git'
+        dest: "{{ uamqpphp_php_src }}"
+        version: "{{ uamqpphp_php_version }}"
+      tags: ["tools", "php"]
+
+    - name: PHP Build Config
+      shell:
+        cmd: "./buildconf --force --debug"
+        chdir: "{{ uamqpphp_php_src }}"
+      tags: ["tools", "php"]
+      when:
+        - php_bin.stat.exists == False
+
+    - name: Configure PHP
+      shell:
+        cmd: "./configure --without-iconv --enable-debug --enable-phpdbg --enable-sockets --with-curl --with-openssl --prefix={{ uamqpphp_php_bin }} --with-config-file-path={{ uamqpphp_php_ini }}"
+        chdir: "{{ uamqpphp_php_src }}"
+      tags: ["tools", "php"]
+      when:
+        - php_bin.stat.exists == False
+
+    - name: Build PHP
+      make:
+        chdir: "{{ uamqpphp_php_src }}"
+      tags: ["tools", "php"]
+      when:
+        - php_bin.stat.exists == False
+
+    - name: Install PHP
+      make:
+        chdir: "{{ uamqpphp_php_src }}"
+        target: install
+      tags: ["tools", "php"]
+      when:
+        - php_bin.stat.exists == False
+
+    - name: Create php.ini directory
+      file:
+        path: "{{ uamqpphp_php_ini }}"
+        state: directory
+      when:
+        - php_bin.stat.exists == False
+
+    - name: Copy development php.ini
+      shell:
+        cmd: "cp {{ uamqpphp_php_src }}/php.ini-development {{ uamqpphp_php_ini }}/php.ini"
+        chdir: "{{ uamqpphp_php_src }}"
+      tags: ["tools", "php"]
+      when:
+        - php_bin.stat.exists == False
 
     - name: intall dependecies of azure-uamqp-c
       package:
@@ -43,4 +107,3 @@
 
   roles:
     - { role: "iroquoisorg.env" }
-    - { role: "iroquoisorg.php7" }

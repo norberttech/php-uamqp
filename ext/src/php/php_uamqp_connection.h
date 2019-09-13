@@ -8,7 +8,6 @@ zend_class_entry *php_uamqp_connection_ce(void);
 typedef struct _uaqmp_connection_object_properties {
     zend_string *host;
     zend_long port;
-    zend_bool useTLS;
     zend_string *policyName;
     zend_string *policyKey;
 } uaqmp_connection_object_properties;

@@ -85,6 +85,6 @@ UAMQP\Producer::sendMessage(UAMQP\Message $message, UAMQP\Destination $destinati
 ------
 UAMQP\Consumer
 ------
-UAMQP\Consumer::__construct(UAMQP\Connection $message)
+UAMQP\Consumer::__construct(UAMQP\Connection $message, int $settleMode)
 UAMQP\Consumer::listen(callable $callback, UAMQP\Destination $message) : void
 ------

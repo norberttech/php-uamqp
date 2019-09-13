@@ -24,7 +24,7 @@ $producer->sendMessage(new \UAMQP\Message($payload = "this is some random test m
 $producer->sendMessage(new \UAMQP\Message($payload = "this is some random test message 3 " . time()), $destination);
 $producer->sendMessage(new \UAMQP\Message($payload = "this is some random test message 4 " . time()), $destination);
 
-$consumer = new \UAMQP\Consumer($connection);
+$consumer = new \UAMQP\Consumer($connection, \UAMQP\Consumer::RECEIVE_AND_DELETE);
 
 $i = 0;
 

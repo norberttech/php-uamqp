@@ -38,6 +38,7 @@ jobs:
           PHP_UAMQP_TEST_SB_POLICY_KEY: ${{ secrets.ENV_PHP_UAMQP_TEST_SB_POLICY_KEY }}
           PHP_UAMQP_TEST_SB_POLICY_NAME: ${{ secrets.ENV_PHP_UAMQP_TEST_SB_POLICY_NAME }}
           PHP_UAMQP_TEST_SB_DESTINATION: ${{ secrets.ENV_PHP_UAMQP_TEST_SB_DESTINATION }}
+          NO_INTERACTION: 1
       - name: Dump outptup from failed tests
         if: failure()
         run: find . -name "*.out" -type f -exec cat {} \;

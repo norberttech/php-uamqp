@@ -180,33 +180,90 @@ void send_message(struct uamqp uamqp_connection, struct uamqp_message_sender uam
 
 // RECEIVER
 
+static const int RECEIVE_AND_DELETE = 0;
+static const int PEAK_AND_LOCK = 1;
+
+static const int RECEIVER_ACCEPT_NEXT = 2;
+static const int RECEIVER_STOP = 3;
+static const int RECEIVER_ACCEPT_STOP = 4;
+
 bool keep_receiving = false;
-bool (*receiver_callback_type)(char *msg) = NULL;
+int (*receiver_callback_type)(char *msg) = NULL;
+int  _uamqp_receiver_settle_mode = 0;
+MESSAGE_RECEIVER_HANDLE _uamqp_message_receiver = NULL;
 
 static AMQP_VALUE on_message_received(const void* context, MESSAGE_HANDLE message) {
-    BINARY_DATA binary_data;
-    char raw_message[65536] = {};
-
-    (void)context;
-    (void)message;
-
     if (keep_receiving == true) {
+        BINARY_DATA binary_data;
+        char raw_message[65536] = {};
+
+        (void)context;
+        (void)message;
 
         message_get_body_amqp_data_in_place(message, 0, &binary_data);
-
         strncpy(raw_message, (const char *) binary_data.bytes, binary_data.length);
 
-        if (receiver_callback_type(raw_message) == true) {
-            keep_receiving = false;
+        if (_uamqp_receiver_settle_mode == RECEIVE_AND_DELETE) {
+
+            switch (receiver_callback_type(raw_message)) {
+                case RECEIVER_STOP:
+                case RECEIVER_ACCEPT_STOP:
+                    keep_receiving = false;
+                    return messaging_delivery_accepted();
+                case RECEIVER_ACCEPT_NEXT:
+                    keep_receiving = true;
+                    return messaging_delivery_accepted();
+                default:
+                    keep_receiving = false;
+                    return messaging_delivery_released();
+            }
         }
 
-        return messaging_delivery_accepted();
-    } else {
-        return messaging_delivery_released();
+        if (_uamqp_receiver_settle_mode == PEAK_AND_LOCK) {
+
+            delivery_number message_id;
+            const char* link_name;
+
+            messagereceiver_get_received_message_id(_uamqp_message_receiver, &message_id);
+            messagereceiver_get_link_name(_uamqp_message_receiver, &link_name);
+
+            switch (receiver_callback_type(raw_message)) {
+                case RECEIVER_STOP: {
+                    AMQP_VALUE result = messaging_delivery_released();
+                    keep_receiving = false;
+                    messagereceiver_send_message_disposition(_uamqp_message_receiver, link_name, message_id, result);
+
+                    return result;
+                }
+                case RECEIVER_ACCEPT_STOP: {
+                    AMQP_VALUE result = messaging_delivery_accepted();
+                    keep_receiving = false;
+                    messagereceiver_send_message_disposition(_uamqp_message_receiver, link_name, message_id, result);
+
+                    return result;
+                }
+                case RECEIVER_ACCEPT_NEXT: {
+                    AMQP_VALUE result = messaging_delivery_accepted();
+                    keep_receiving = true;
+                    messagereceiver_send_message_disposition(_uamqp_message_receiver, link_name, message_id, result);
+
+                    return result;
+                }
+                default: {
+                    AMQP_VALUE result = messaging_delivery_released();
+                    keep_receiving = false;
+                    messagereceiver_send_message_disposition(_uamqp_message_receiver, link_name, message_id, result);
+
+                    return result;
+                }
+            }
+        }
     }
+
+    return messaging_delivery_released();
 }
 
-struct uamqp_message_receiver create_message_receiver(struct uamqp_session uamqp_session, char *host, char *destination)
+struct uamqp_message_receiver create_message_receiver(struct uamqp_session uamqp_session, char *host, char *destination, int settle_mode)
 {
     struct uamqp_message_receiver receiver;
     AMQP_VALUE source;
@@ -217,18 +274,30 @@ struct uamqp_message_receiver create_message_receiver(struct uamqp_session uamqp
 
     source = messaging_create_source(uamqpHost);
     target = messaging_create_target("ingress-rx");
-    receiver.link = link_create(uamqp_session.session, "receiver-link", role_receiver, source, target);
-    link_set_rcv_settle_mode(receiver.link, receiver_settle_mode_first);
+    receiver.link = link_create(uamqp_session.session, "receiver-link", role_receiver, source, target); // @TODO: Replace link name with uuid
+
+    if (settle_mode == RECEIVE_AND_DELETE) {
+        link_set_rcv_settle_mode(receiver.link, receiver_settle_mode_first);
+    }
+
+    if (settle_mode == PEAK_AND_LOCK) {
+        link_set_rcv_settle_mode(receiver.link, receiver_settle_mode_second);
+    } else {
+        link_set_rcv_settle_mode(receiver.link, receiver_settle_mode_first); // use receive and delete as a default
+    }
 
     amqpvalue_destroy(source);
     amqpvalue_destroy(target);
 
     receiver.message_receiver = messagereceiver_create(receiver.link, NULL, NULL);
+    receiver.settle_mode = settle_mode;
+    _uamqp_message_receiver = receiver.message_receiver;
+    _uamqp_receiver_settle_mode = settle_mode;
 
     return receiver;
 }
 
-void uamqp_open_receiver(struct uamqp uamqp_connection, struct uamqp_message_receiver uamqp_message_receiver, bool (*callback)(char *msg))
+void uamqp_open_receiver(struct uamqp uamqp_connection, struct uamqp_message_receiver uamqp_message_receiver,  int (*callback)(char *msg))
 {
     messagereceiver_open(uamqp_message_receiver.message_receiver, on_message_received, uamqp_message_receiver.message_receiver);
 
