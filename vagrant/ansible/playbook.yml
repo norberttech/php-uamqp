@@ -4,9 +4,9 @@
   become: yes
   remote_user: vagrant
   vars:
-    uamqpphp_php_bin: "/home/vagrant/php-bin"
-    uamqpphp_php_ini: "/home/vagrant/php-ini"
-    uamqpphp_php_src: "/home/vagrant/php-src"
+    uamqpphp_php_src: "/home/vagrant/php-uamqp/php-build/src"
+    uamqpphp_php_bin: "/home/vagrant/php-uamqp/php-build/{{ php_version }}"
+    uamqpphp_php_ini: "/home/vagrant/php-uamqp/php-build/{{ php_version }}/php-ini"
     uamqpphp_php_version: "PHP-{{ php_version }}"
 
     env_timezone: "UTC"
@@ -31,12 +31,28 @@
         - "libxml2-dev"
         - "sqlite3"
         - "libsqlite3-dev"
+        - "libcurl4-gnutls-dev"
       tags: ["tools", "php"]
 
     - name: Register PHP binary variable
       stat:
         path: "{{ uamqpphp_php_bin }}/bin/php"
       register: php_bin
+
+    - name: Create src directory folder
+      file:
+        path: "{{ uamqpphp_php_src }}"
+        state: directory
+
+    - name: Create bin directory folder
+      file:
+        path: "{{ uamqpphp_php_bin }}"
+        state: directory
+
+    - name: Create ini directory folder
+      file:
+        path: "{{ uamqpphp_php_ini }}"
+        state: directory
 
     - name: Clone php repository
       git:

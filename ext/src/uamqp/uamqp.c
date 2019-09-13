@@ -179,13 +179,12 @@ void send_message(struct uamqp uamqp_connection, struct uamqp_message_sender uam
 }
 
 // RECEIVER
+#define RECEIVE_AND_DELETE 0
+#define PEAK_AND_LOCK 1
 
-static const int RECEIVE_AND_DELETE = 0;
-static const int PEAK_AND_LOCK = 1;
-
-static const int RECEIVER_ACCEPT_NEXT = 2;
-static const int RECEIVER_STOP = 3;
-static const int RECEIVER_ACCEPT_STOP = 4;
+#define RECEIVER_ACCEPT_NEXT 2
+#define RECEIVER_STOP 3
+#define RECEIVER_ACCEPT_STOP 4
 
 bool keep_receiving = false;
 int (*receiver_callback_type)(char *msg) = NULL;
