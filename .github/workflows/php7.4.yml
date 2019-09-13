@@ -1,4 +1,4 @@
-name: PHP 7.3
+name: PHP 7.4
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   test:
-    name: PHP 7.3
+    name: PHP 7.4
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@master
@@ -24,9 +24,9 @@ jobs:
         working-directory: ./ext/php-build
         run: git clone https://github.com/php/php-src.git
 
-      - name: Checkout to PHP 7.3.9
+      - name: Checkout to PHP 7.4.0
         working-directory: ./ext/php-build/php-src
-        run: git checkout PHP-7.3.9
+        run: git checkout PHP-7.4.0beta4
 
       - name: Build PHP Config
         working-directory: ./ext/php-build/php-src
@@ -34,11 +34,11 @@ jobs:
 
       - name: Create Build destinations
         working-directory: ./ext/php-build
-        run: mkdir 7.3.9 && mkdir 7.3.9/php-ini
+        run: mkdir 7.4.0 && mkdir 7.4.0/php-ini
 
       - name: Configure PHP
         working-directory: ./ext/php-build/php-src
-        run: ./configure --without-iconv --enable-debug --enable-phpdbg --enable-sockets --with-curl --with-openssl --prefix=$PWD/../7.3.9 --with-config-file-path=$PWD/../7.3.9/php-ini
+        run: ./configure --without-iconv --enable-debug --enable-phpdbg --enable-sockets --with-curl --with-openssl --prefix=$PWD/../7.4.0 --with-config-file-path=$PWD/../7.4.0/php-ini
 
       - name: Build PHP
         working-directory: ./ext/php-build/php-src
@@ -55,7 +55,7 @@ jobs:
         working-directory: ./ext
         run: ./bin/init.sh
         env:
-          PHP_UAMQP_PHP_EXECUTABLE: php-build/7.3.9/bin
+          PHP_UAMQP_PHP_EXECUTABLE: php-build/7.4.0/bin
 
       - name: Build extension & run testsuite
         working-directory: ./ext
@@ -65,7 +65,7 @@ jobs:
           PHP_UAMQP_TEST_SB_POLICY_KEY: ${{ secrets.ENV_PHP_UAMQP_TEST_SB_POLICY_KEY }}
           PHP_UAMQP_TEST_SB_POLICY_NAME: ${{ secrets.ENV_PHP_UAMQP_TEST_SB_POLICY_NAME }}
           PHP_UAMQP_TEST_SB_DESTINATION: ${{ secrets.ENV_PHP_UAMQP_TEST_SB_DESTINATION }}
-          PHP_UAMQP_PHP_EXECUTABLE: php-build/7.3.9/bin
+          PHP_UAMQP_PHP_EXECUTABLE: php-build/7.4.0/bin
           PHP_UAMQP_TEST_FUNCTIONAL_SKIP: 0
           NO_INTERACTION: 1
 
