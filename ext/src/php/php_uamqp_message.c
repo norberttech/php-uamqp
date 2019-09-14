@@ -75,11 +75,6 @@ void uamqp_message_object_handler_free(zend_object *object)
     zend_object_std_dtor(&message->zendObject);
 }
 
-void uamqp_message_object_handler_destroy(zend_object *object)
-{
-    zend_objects_destroy_object(object);
-}
-
 static HashTable* uamqp_message_object_debug_info(zval *obj, int *is_temp)
 {
     uamqp_message_object *message = php_uamqp_message_fetch_object(Z_OBJ_P(obj));
@@ -113,7 +108,6 @@ PHP_MINIT_FUNCTION(uamqp_message) {
     memcpy(&uamqp_message_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
     uamqp_message_object_handlers.offset = XtOffsetOf(uamqp_message_object, zendObject);
     uamqp_message_object_handlers.get_debug_info = uamqp_message_object_debug_info;
-    uamqp_message_object_handlers.dtor_obj = uamqp_message_object_handler_destroy;
     uamqp_message_object_handlers.free_obj = uamqp_message_object_handler_free;
 
     return SUCCESS;

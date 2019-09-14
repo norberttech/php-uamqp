@@ -23,6 +23,7 @@ struct uamqp_message {
 struct uamqp_message_receiver {
     LINK_HANDLE link;
     MESSAGE_RECEIVER_HANDLE message_receiver;
+    int settle_mode;
 };
 
 struct uamqp create_uamqp_connection(char *host, int port, char *policyName, char *policyKey);
@@ -34,6 +35,6 @@ struct uamqp_message_sender create_message_sender(struct uamqp_session uamqp_ses
 struct uamqp_message create_message(char *content);
 void send_message(struct uamqp uamqp_connection, struct uamqp_message_sender uamqp_messag_sender, struct uamqp_message uamqp_message);
 
-struct uamqp_message_receiver create_message_receiver(struct uamqp_session uamqp_session, char *host, char *destination);
-void uamqp_open_receiver(struct uamqp uamqp_connection, struct uamqp_message_receiver uamqp_message_receiver, bool (*callback)(char *msg));
+struct uamqp_message_receiver create_message_receiver(struct uamqp_session uamqp_session, char *host, char *destination, int settle_mode);
+void uamqp_open_receiver(struct uamqp uamqp_connection, struct uamqp_message_receiver uamqp_message_receiver, int (*callback)(char *msg));
 

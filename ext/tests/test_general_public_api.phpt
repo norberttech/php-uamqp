@@ -11,8 +11,8 @@ if (!extension_loaded('uamqp')) {
 
 function print_class($className) {
     $reflection = new \ReflectionClass($className);
-    echo $reflection->isFinal() ? 'final ' : ''
-        . $reflection->isAbstract() ? 'abstract ' : ''
+    echo ($reflection->isFinal() ? 'final ' : '')
+        . ($reflection->isAbstract() ? 'abstract ' : '')
         . $className . "\n";
 
     echo "------\n";
@@ -38,7 +38,7 @@ function print_class($className) {
             $method .= ' :';
 
             if ($reflectionMethod->hasReturnType()) {
-                $method .= $reflectionMethod->getReturnType()->allowsNull() ? ' ?' : ' ';
+                $method .= ($reflectionMethod->getReturnType()->allowsNull() ? ' ?' : ' ');
                 $method .= $reflectionMethod->getReturnType()->getName();
             } else {
                 $method .= ' void';
@@ -85,6 +85,6 @@ UAMQP\Producer::sendMessage(UAMQP\Message $message, UAMQP\Destination $destinati
 ------
 UAMQP\Consumer
 ------
-UAMQP\Consumer::__construct(UAMQP\Connection $message)
+UAMQP\Consumer::__construct(UAMQP\Connection $message, int $settleMode)
 UAMQP\Consumer::listen(callable $callback, UAMQP\Destination $message) : void
 ------

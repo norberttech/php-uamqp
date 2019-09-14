@@ -140,7 +140,9 @@ void uamqp_connection_object_handler_free(zend_object *object)
     uamqp_connection_object *connection = php_uamqp_connection_fetch_object(object);
 
     destroy_connection(&connection->uamqp_connection, &connection->uamqp_session);
-
+    zend_string_release(connection->properties.host);
+    zend_string_release(connection->properties.policyKey);
+    zend_string_release(connection->properties.policyName);
     zend_object_std_dtor(&connection->zendObject);
 }
 

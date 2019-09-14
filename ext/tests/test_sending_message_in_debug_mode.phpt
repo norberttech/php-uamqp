@@ -10,6 +10,10 @@ if (!getenv('PHP_UAMQP_TEST_SB_POLICY_NAME')) {
     echo 'skip';
 }
 
+if ((int) getenv('PHP_UAMQP_TEST_FUNCTIONAL_SKIP') === 1) {
+    echo 'skip';
+}
+
 ?>
 --FILE--
 <?php
@@ -22,13 +26,10 @@ $destination = new \UAMQP\Destination(getenv('PHP_UAMQP_TEST_SB_DESTINATION'));
 
 $producer->sendMessage(new \UAMQP\Message($payload = "this is some random test message 1 " . time()), $destination);
 
+$consumer = new \UAMQP\Consumer($connection, \UAMQP\Consumer::RECEIVE_AND_DELETE);
 
-$consumer = new \UAMQP\Consumer($connection);
-
-$i = 0;
-
-$consumer->listen(function($message) use (&$i) {
-    return false;
+$consumer->listen(function($message){
+    return \UAMQP\Consumer::STOP;
 }, $destination);
 
 
