@@ -28,9 +28,9 @@ Vagrant.configure(2) do |config|
             \"php_version\":\"7.3.9\",
             \"uamqp_host\": \"changeme\",
             \"uamqp_policy\": \"changeme\",
-            \"uamqp_key\": \"changeme",
+            \"uamqp_key\": \"changeme\",
             \"uamqp_destination\": \"changeme\",
-            \"test_skip_functional": 1
+            \"test_skip_functional\": 1
         }'"
       ]
     end
