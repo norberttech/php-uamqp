@@ -29,6 +29,7 @@
         name: "{{ item }}"
       with_items:
         - "gcc"
+        - "gdb"
         - "make"
         - "autoconf"
         - "bison"
@@ -114,7 +115,7 @@
       when:
         - php_bin.stat.exists == False
 
-    - name: intall dependecies of azure-uamqp-c
+    - name: Intall dependecies of azure-uamqp-c
       package:
         state: present
         name: "{{ item }}"
@@ -127,6 +128,26 @@
         - "libssl-dev"
         - "uuid-dev"
       tags: ["tools", "azure-uamqp-c"]
+
+    - name: Create directory for core dumps
+      file:
+        path: "/tmp/cores"
+        state: directory
+
+    - name: Change core dumps directory chmod
+      file:
+        path: "/tmp/cores"
+        mode: a+rwx
+
+    - name: Ansible create file with content example
+      shell:
+        cmd: "echo \"/tmp/cores/core.%e.%p.%h.%t\" > /proc/sys/kernel/core_pattern"
+
+    - name: Change core files limit
+      lineinfile:
+        dest: /home/vagrant/.bashrc
+        line: "ulimit -c unlimited"
+      become_use: vagrant
 
   roles:
     - { role: "iroquoisorg.env" }

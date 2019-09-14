@@ -42,6 +42,20 @@ run -dextension=modules/uamqp.so examples/publish_and_receive_to_service_bus.php
 
 $PHP_UAMQP_PHP_EXECUTABLE/php --args -dextension=modules/uamqp.so examples/publish_and_receive_to_service_bus.php
 
+### Browsing core dumps (Vagrant)
+
+By default in vagrant core dumps are saved in `/tmp/cores/` directory. In case you 
+run into "Core Dumped" error list the `/tmp/cores` location, get latest dump and browse it
+using 
+
+```
+gdb $PHP_UAMQP_PHP_EXECUTABLE/php /tmp/cores/core.php.8460.vagrant.1568481785
+```
+
+(replace `core.php.8460.vagrant.1568481785` with core dump file path)
+
+and then in gdb console type `bt`.
+
 ### Running tests without interaction 
 
 ```console
