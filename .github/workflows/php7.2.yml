@@ -4,8 +4,9 @@ on:
   pull_request:
     branches:
       - master
-  schedule:
-    - cron:  '15 8 * * *'
+#  Schedule disabled because possible PHP bug https://gist.github.com/norzechowicz/f0264ae1f95435b48bc6b8a44e79b056
+#  schedule:
+#    - cron:  '15 8 * * *'
 
 jobs:
   test:
