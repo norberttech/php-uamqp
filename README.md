@@ -1,6 +1,6 @@
 ## azure-uaqmp-c php bindings
 
-This extensions bring to php bindings for [Azure uAMQP C Library](https://github.com/Azure/azure-uamqp-c), a general purpose C library for AMQP 1.0.
+This extensions brings to php bindings for [Azure uAMQP C Library](https://github.com/Azure/azure-uamqp-c), a general purpose C library for AMQP 1.0.
 
 ## PHP Minimum Version
 
@@ -64,7 +64,6 @@ const \UAMQP\Receiver::PEAK_AND_LOCK = 1;
 const \UAMQP\Receiver::ACCEPT_NEXT = 2;
 const \UAMQP\Receiver::STOP = 3;
 const \UAMQP\Receiver::ACCEPT_STOP = 4;
-const \UAMQP\Receiver::RELEASE = 5;
 
 \UAMQP\Consumer::__construct(\UAMQP\Connection $message)
 
