@@ -2,9 +2,17 @@
 
 This extensions brings to php bindings for [Azure uAMQP C Library](https://github.com/Azure/azure-uamqp-c), a general purpose C library for AMQP 1.0.
 
-## PHP Minimum Version
+## PHP supported Versions
 
-PHP 7.3+ 
+| PHP Version   | Supported     |
+| ------------- | ------------- |
+| 7.2           | ⚠*            |
+| 7.3           | ✅            |
+| 7.4           | ✅            |
+
+> ⚠ [php 7.2 issue explanation](https://gist.github.com/norzechowicz/f0264ae1f95435b48bc6b8a44e79b056) - in theory 
+> extension should work fine with php 7.2 compiled without --enable-debug flag but the code is not tested against
+> this version.  
 
 ## Development
 
