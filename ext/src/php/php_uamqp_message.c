@@ -1,6 +1,5 @@
 #include <php.h>
 #include <Zend/zend_exceptions.h>
-#include "../../php_uamqp.h"
 #include "php_uamqp_message.h"
 #include "php_uamqp_exception.h"
 
@@ -18,20 +17,21 @@ zend_class_entry *php_uamqp_message_ce(void)
 
 METHOD(__construct)
 {
-    zend_string *payload;
+    char *payload;
+    size_t payload_length;
     uamqp_message_object *object;
 
     ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-        Z_PARAM_STR_EX(payload, 1, 0)
+        Z_PARAM_STRING_EX(payload, payload_length, 1, 1)
     ZEND_PARSE_PARAMETERS_END();
 
     object = UAMQP_MESSAGE_OBJECT(getThis());
 
-    if (payload->len > 64500) {
+    if (payload_length > 64500) {
         zend_throw_exception(php_uamqp_exception_ce(), "Message payload can't be longer than 64500 characters.", 0);
     }
 
-    object->payload = zend_string_copy(payload);
+    object->payload = estrdup(payload);
 }
 
 METHOD(payload)
@@ -40,7 +40,7 @@ METHOD(payload)
 
     uamqp_message_object *message = UAMQP_MESSAGE_OBJECT(getThis());
 
-    RETVAL_STR(message->payload);
+    RETURN_STRING(message->payload);
 }
 
 ZEND_BEGIN_ARG_INFO_EX(message_construct_arginfo, 0, 0, 1)
@@ -71,29 +71,26 @@ void uamqp_message_object_handler_free(zend_object *object)
 {
     uamqp_message_object *message = php_uamqp_message_fetch_object(object);
 
-    zend_string_release(message->payload);
+    efree(message->payload);
     zend_object_std_dtor(&message->zendObject);
 }
 
 static HashTable* uamqp_message_object_debug_info(zval *obj, int *is_temp)
 {
+    zval ary;
     uamqp_message_object *message = php_uamqp_message_fetch_object(Z_OBJ_P(obj));
-    zval tmp;
-    zend_string *payload_key;
-    HashTable *debug_info;
 
     *is_temp = 1;
 
-    ALLOC_HASHTABLE(debug_info);
-    zend_hash_init(debug_info, 1, NULL, ZVAL_PTR_DTOR, 0);
+    array_init(&ary);
 
-    ZVAL_STR(&tmp, message->payload);
-    payload_key = zend_string_init("payload", sizeof("payload") - 1, 0);
-    zend_hash_update(debug_info, payload_key, &tmp);
-    zend_string_release(payload_key);
-    zval_dtor(&tmp);
+    if (!message) {
+        return Z_ARRVAL(ary);
+    }
 
-    return debug_info;
+    add_assoc_string(&ary, "payload", message->payload);
+
+    return Z_ARRVAL(ary);
 }
 
 PHP_MINIT_FUNCTION(uamqp_message) {

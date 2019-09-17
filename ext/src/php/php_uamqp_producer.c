@@ -59,7 +59,7 @@ METHOD(sendMessage)
     send_message(
         object->uamqp_connection->uamqp_connection,
         create_message_sender(object->uamqp_connection->uamqp_session, ZSTR_VAL(object->uamqp_connection->properties.host), ZSTR_VAL(destination->value)),
-        create_message(ZSTR_VAL(message->payload))
+        create_message(message->payload)
     );
 }
 

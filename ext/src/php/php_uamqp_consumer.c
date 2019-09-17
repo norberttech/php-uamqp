@@ -59,16 +59,13 @@ METHOD(__construct)
 int callback(char *msg)
 {
     int callback_return;
-    zval message_object, constructor_arg, constructor_result, callback_result;
-
-    // initialize value (zval) of Message object constructor argument from string
-    ZVAL_STRING(&constructor_arg, msg);
+    zval message_object, callback_result;
 
     //Initialize UAMQP\Message object
     object_init_ex(&message_object, php_uamqp_message_ce());
 
-    // execute UAMQP\Message object constructor
-    zend_call_method_with_1_params(&message_object, php_uamqp_message_ce(), &php_uamqp_message_ce()->constructor, "__construct", &constructor_result, &constructor_arg);
+    uamqp_message_object *message = php_uamqp_message_fetch_object(Z_OBJ(message_object));
+    message->payload = estrdup(msg);
 
     // Prepare callback
     listen_method_callback.param_count = 1;
@@ -81,19 +78,15 @@ int callback(char *msg)
 
     // cleanup
     zval_dtor(&message_object);
-    zval_dtor(&constructor_arg);
-    zval_dtor(&constructor_result);
+    zval_dtor(&callback_result);
+    efree(message->payload);
 
-    // stop next message consumption if exception
     if (EG(exception)) {
-        zval_dtor(&callback_result);
-
         return RECEIVER_STOP;
     }
 
     // stop next message consumption if callback did not returned SUCCESS
     if (callback_return != SUCCESS || Z_TYPE(callback_result) == IS_UNDEF) {
-        zval_dtor(&callback_result);
 
         return RECEIVER_STOP;
     }
@@ -101,7 +94,6 @@ int callback(char *msg)
     // do not stop message consumption if callback returned true
     if (Z_TYPE(callback_result) == IS_LONG) {
         int result = Z_LVAL(callback_result);
-        zval_dtor(&callback_result);
 
         if (result < RECEIVER_ACCEPT_NEXT || result > RECEIVER_ACCEPT_STOP) {
             zend_throw_exception(php_uamqp_exception_ce(), "Invalid consumer callback return.", 0);
@@ -115,14 +107,11 @@ int callback(char *msg)
         return RECEIVER_ACCEPT_NEXT;
     }
 
-
     if (Z_TYPE(callback_result) == IS_FALSE) {
 
         return RECEIVER_STOP;
     }
 
-
-    zval_dtor(&callback_result);
     // stop message consumption, callback did not return anything or returned false
     return RECEIVER_STOP;
 }

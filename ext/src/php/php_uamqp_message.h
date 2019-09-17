@@ -11,7 +11,7 @@ zend_class_entry *php_uamqp_message_ce(void);
 zend_object *uamqp_message_handler_create(zend_class_entry *ce);
 
 typedef struct _uamqp_message_object {
-    zend_string *payload;
+    char *payload;
     zend_object zendObject;
 } uamqp_message_object;
 
