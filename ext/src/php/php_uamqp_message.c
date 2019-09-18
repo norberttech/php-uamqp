@@ -12,19 +12,19 @@ METHOD(__construct)
 {
     char *payload;
     size_t payload_length;
-    php_uamqp_message_object *object;
+    php_uamqp_message_object *message_object;
 
     ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
         Z_PARAM_STRING_EX(payload, payload_length, 1, 1)
     ZEND_PARSE_PARAMETERS_END();
 
-    object = php_uamqp_message_fetch_object(Z_OBJ_P(getThis()));
+    message_object = php_uamqp_message_fetch_object(Z_OBJ_P(getThis()));
 
     if (payload_length > 64500) {
         zend_throw_exception(php_uamqp_exception_ce(), "Message payload can't be longer than 64500 characters.", 0);
     }
 
-    object->payload = estrdup(payload);
+    message_object->payload = estrdup(payload);
 }
 
 METHOD(payload)

@@ -1,22 +1,14 @@
 #include <php.h>
 #include <string.h>
-#include <ext/standard/php_var.h>
 #include <Zend/zend_interfaces.h>
 #include <Zend/zend_exceptions.h>
-#include "php_uamqp_producer.h"
-#include "php_uamqp_connection.h"
 #include "php_uamqp_message.h"
 #include "php_uamqp_destination.h"
 #include "php_uamqp_consumer.h"
 #include "php_uamqp_exception.h"
 
-#define PHP_UAMQP_CONSUMER_CLASS "Consumer"
-
 #define METHOD(name) PHP_METHOD(UAMQPConsumer, name)
 #define ME(name, arginfo, visibility) PHP_ME(UAMQPConsumer, name, arginfo, visibility)
-
-#define UAMQP_CONSUMER_OBJECT(obj) \
-    (uamqp_consumer_object *)((char *) Z_OBJ_P(obj) - Z_OBJ_P(obj)->handlers->offset)
 
 static const int RECEIVER_RECEIVE_AND_DELETE = 0;
 static const int RECEIVER_PEAK_AND_LOCK = 1;
@@ -24,47 +16,38 @@ static const int RECEIVER_ACCEPT_NEXT = 2;
 static const int RECEIVER_STOP = 3;
 static const int RECEIVER_ACCEPT_STOP = 4;
 
-zend_class_entry *uamqp_consumer_ce;
 zend_object_handlers uamqp_consumer_object_handlers;
 
 zend_fcall_info listen_method_callback;
 zend_fcall_info_cache listen_method_callback_cache;
 
-typedef struct _uamqp_consumer_object {
-    uamqp_connection_object *uamqp_connection;
-    int settle_mode;
-    zend_object zendObject;
-} uamqp_consumer_object;
-
-static inline uamqp_consumer_object *php_uamqp_consumer_fetch_object(zend_object *obj) {
-    return (uamqp_consumer_object *)((char*)(obj) - XtOffsetOf(uamqp_consumer_object, zendObject));
-}
-
 METHOD(__construct)
 {
-    zval *connection_argument;
-    zend_long settle_mode_argument;
+    zval *connection_object_argument;
+    uamqp_consumer_object *consumer_object;
+    long settle_mode_argument;
 
     ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2);
-        Z_PARAM_OBJECT_OF_CLASS_EX(connection_argument, php_uamqp_connection_ce(), 1, 0);
+        Z_PARAM_OBJECT_OF_CLASS_EX(connection_object_argument, php_uamqp_connection_ce(), 1, 0);
         Z_PARAM_LONG(settle_mode_argument);
     ZEND_PARSE_PARAMETERS_END();
 
-    uamqp_consumer_object *object = UAMQP_CONSUMER_OBJECT(getThis());
+    consumer_object = php_uamqp_consumer_fetch_object(Z_OBJ_P(getThis()));
 
-    object->uamqp_connection = UAMQP_CONNECTION_OBJECT(connection_argument);
-    object->settle_mode = (int) settle_mode_argument;
+    consumer_object->uamqp_connection = php_uamqp_connection_fetch_object(Z_OBJ_P(connection_object_argument));
+    consumer_object->settle_mode = settle_mode_argument;
 }
 
 int callback(char *msg)
 {
     int callback_return;
     zval message_object, callback_result;
+    php_uamqp_message_object *message;
 
     //Initialize UAMQP\Message object
     object_init_ex(&message_object, php_uamqp_message_ce);
 
-    php_uamqp_message_object *message = php_uamqp_message_fetch_object(Z_OBJ(message_object));
+    message = php_uamqp_message_fetch_object(Z_OBJ(message_object));
     message->payload = estrdup(msg);
 
     // Prepare callback
@@ -130,7 +113,7 @@ METHOD(listen)
         Z_PARAM_OBJECT_OF_CLASS_EX(destination_argument, php_uamqp_destination_ce(), 1, 0);
     ZEND_PARSE_PARAMETERS_END();
 
-    object = UAMQP_CONSUMER_OBJECT(getThis());
+    object = php_uamqp_consumer_fetch_object(Z_OBJ_P(getThis()));
     destination = UAMQP_DESTINATION_OBJECT(destination_argument);
 
     uamqp_open_receiver(
@@ -182,14 +165,13 @@ PHP_MINIT_FUNCTION(uamqp_consumer) {
 
     ce_consumer.create_object = uamqp_consumer_handler_create;
 
-    uamqp_consumer_ce = zend_register_internal_class(&ce_consumer);
+    php_uamqp_consumer_ce = zend_register_internal_class(&ce_consumer);
 
-    zend_declare_class_constant_long(uamqp_consumer_ce, ZEND_STRL("RECEIVE_AND_DELETE"), RECEIVER_RECEIVE_AND_DELETE);
-    zend_declare_class_constant_long(uamqp_consumer_ce, ZEND_STRL("PEAK_AND_LOCK"), RECEIVER_PEAK_AND_LOCK);
-
-    zend_declare_class_constant_long(uamqp_consumer_ce, ZEND_STRL("ACCEPT_NEXT"), RECEIVER_ACCEPT_NEXT);
-    zend_declare_class_constant_long(uamqp_consumer_ce, ZEND_STRL("STOP"), RECEIVER_STOP);
-    zend_declare_class_constant_long(uamqp_consumer_ce, ZEND_STRL("ACCEPT_STOP"), RECEIVER_ACCEPT_STOP);
+    zend_declare_class_constant_long(php_uamqp_consumer_ce, ZEND_STRL("RECEIVE_AND_DELETE"), RECEIVER_RECEIVE_AND_DELETE);
+    zend_declare_class_constant_long(php_uamqp_consumer_ce, ZEND_STRL("PEAK_AND_LOCK"), RECEIVER_PEAK_AND_LOCK);
+    zend_declare_class_constant_long(php_uamqp_consumer_ce, ZEND_STRL("ACCEPT_NEXT"), RECEIVER_ACCEPT_NEXT);
+    zend_declare_class_constant_long(php_uamqp_consumer_ce, ZEND_STRL("STOP"), RECEIVER_STOP);
+    zend_declare_class_constant_long(php_uamqp_consumer_ce, ZEND_STRL("ACCEPT_STOP"), RECEIVER_ACCEPT_STOP);
 
     memcpy(&uamqp_consumer_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
     uamqp_consumer_object_handlers.offset = XtOffsetOf(uamqp_consumer_object, zendObject);

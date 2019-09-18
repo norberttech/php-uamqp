@@ -1,5 +1,4 @@
 #include <php.h>
-#include <stdbool.h>
 #include <azure_uamqp_c/uamqp.h>
 #include "php_uamqp_connection.h"
 
