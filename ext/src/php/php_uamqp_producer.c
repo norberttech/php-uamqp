@@ -43,17 +43,17 @@ METHOD(sendMessage)
 {
     zval *message_argument;
     zval *destination_argument;
-    uamqp_message_object *message;
+    php_uamqp_message_object *message;
     uamqp_destination_object *destination;
     uamqp_producer_object *object;
 
     ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
-        Z_PARAM_OBJECT_OF_CLASS_EX(message_argument, php_uamqp_message_ce(), 1, 0);
+        Z_PARAM_OBJECT_OF_CLASS_EX(message_argument, php_uamqp_message_ce, 1, 0);
         Z_PARAM_OBJECT_OF_CLASS_EX(destination_argument, php_uamqp_destination_ce(), 1, 0);
     ZEND_PARSE_PARAMETERS_END();
 
     object = UAMQP_PRODUCER_OBJECT(getThis());
-    message = UAMQP_MESSAGE_OBJECT(message_argument);
+    message = php_uamqp_message_fetch_object(Z_OBJ_P(message_argument));
     destination = UAMQP_DESTINATION_OBJECT(destination_argument);
 
     send_message(

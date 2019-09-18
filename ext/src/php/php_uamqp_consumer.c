@@ -62,9 +62,9 @@ int callback(char *msg)
     zval message_object, callback_result;
 
     //Initialize UAMQP\Message object
-    object_init_ex(&message_object, php_uamqp_message_ce());
+    object_init_ex(&message_object, php_uamqp_message_ce);
 
-    uamqp_message_object *message = php_uamqp_message_fetch_object(Z_OBJ(message_object));
+    php_uamqp_message_object *message = php_uamqp_message_fetch_object(Z_OBJ(message_object));
     message->payload = estrdup(msg);
 
     // Prepare callback
