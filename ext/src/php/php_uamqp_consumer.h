@@ -8,7 +8,7 @@ PHP_MINIT_FUNCTION(uamqp_consumer);
 zend_class_entry *php_uamqp_consumer_ce;
 
 typedef struct _uamqp_consumer_object {
-    uamqp_connection_object *uamqp_connection;
+    php_uamqp_connection_object *uamqp_connection;
     long settle_mode;
     zend_object zendObject;
 } uamqp_consumer_object;

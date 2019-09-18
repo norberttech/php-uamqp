@@ -14,12 +14,12 @@ METHOD(__construct)
     zval *connection_object_argument;
 
     ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1);
-        Z_PARAM_OBJECT_OF_CLASS_EX(connection_object_argument, php_uamqp_connection_ce(), 1, 0);
+        Z_PARAM_OBJECT_OF_CLASS_EX(connection_object_argument, php_uamqp_connection_ce, 1, 0);
     ZEND_PARSE_PARAMETERS_END();
 
     uamqp_producer_object *object = php_uamqp_producer_fetch_object(Z_OBJ_P(getThis()));
 
-    object->uamqp_connection = UAMQP_CONNECTION_OBJECT(connection_object_argument);
+    object->uamqp_connection = php_uamqp_connection_fetch_object(Z_OBJ_P(connection_object_argument));
 }
 
 METHOD(sendMessage)
@@ -41,7 +41,7 @@ METHOD(sendMessage)
 
     send_message(
         producer->uamqp_connection->uamqp_connection,
-        create_message_sender(producer->uamqp_connection->uamqp_session, ZSTR_VAL(producer->uamqp_connection->properties.host), destination->value),
+        create_message_sender(producer->uamqp_connection->uamqp_session, producer->uamqp_connection->properties.host, destination->value),
         create_message(message->payload)
     );
 }

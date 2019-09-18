@@ -28,7 +28,7 @@ METHOD(__construct)
     long settle_mode_argument;
 
     ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2);
-        Z_PARAM_OBJECT_OF_CLASS_EX(connection_object_argument, php_uamqp_connection_ce(), 1, 0);
+        Z_PARAM_OBJECT_OF_CLASS_EX(connection_object_argument, php_uamqp_connection_ce, 1, 0);
         Z_PARAM_LONG(settle_mode_argument);
     ZEND_PARSE_PARAMETERS_END();
 
@@ -118,7 +118,7 @@ METHOD(listen)
 
     uamqp_open_receiver(
         consumer_object->uamqp_connection->uamqp_connection,
-        create_message_receiver(consumer_object->uamqp_connection->uamqp_session, ZSTR_VAL(consumer_object->uamqp_connection->properties.host), destination->value, consumer_object->settle_mode),
+        create_message_receiver(consumer_object->uamqp_connection->uamqp_session, consumer_object->uamqp_connection->properties.host, destination->value, consumer_object->settle_mode),
         callback
     );
 }

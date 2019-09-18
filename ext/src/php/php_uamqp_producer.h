@@ -8,7 +8,7 @@ PHP_MINIT_FUNCTION(uamqp_producer);
 zend_class_entry *php_uamqp_producer_ce;
 
 typedef struct _uamqp_producer_object {
-    uamqp_connection_object *uamqp_connection;
+    php_uamqp_connection_object *uamqp_connection;
     zend_object zendObject;
 } uamqp_producer_object;
 
