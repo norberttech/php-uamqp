@@ -79,7 +79,7 @@ int callback(char *msg)
         int result = Z_LVAL(callback_result);
 
         if (result < RECEIVER_ACCEPT_NEXT || result > RECEIVER_ACCEPT_STOP) {
-            zend_throw_exception(php_uamqp_exception_ce(), "Invalid consumer callback return.", 0);
+            zend_throw_exception(php_uamqp_exception_ce, "Invalid consumer callback return.", 0);
         }
 
         return result;

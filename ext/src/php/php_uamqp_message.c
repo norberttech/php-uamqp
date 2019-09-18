@@ -21,7 +21,7 @@ METHOD(__construct)
     message_object = php_uamqp_message_fetch_object(Z_OBJ_P(getThis()));
 
     if (payload_length > 64500) {
-        zend_throw_exception(php_uamqp_exception_ce(), "Message payload can't be longer than 64500 characters.", 0);
+        zend_throw_exception(php_uamqp_exception_ce, "Message payload can't be longer than 64500 characters.", 0);
     }
 
     message_object->payload = estrdup(payload);
