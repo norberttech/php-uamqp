@@ -1,6 +1,5 @@
 #include <php.h>
 #include <ext/standard/php_var.h>
-#include <Zend/zend_exceptions.h>
 #include "php_uamqp_destination.h"
 #include "php_uamqp_exception.h"
 
@@ -22,7 +21,7 @@ METHOD(__construct)
     destination_object = php_uamqp_destination_fetch_object(Z_OBJ_P(getThis()));
 
     if (destination_length > 64500) {
-        zend_throw_exception(php_uamqp_exception_ce, "Destination can't be longer than 64500 characters.", 0);
+        php_uamqp_throw_exception("Destination can't be longer than 64500 characters.", 0);
     }
 
     destination_object->value = estrdup(destination);

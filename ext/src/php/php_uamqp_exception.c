@@ -2,6 +2,11 @@
 #include <Zend/zend_exceptions.h>
 #include "php_uamqp_exception.h"
 
+void php_uamqp_throw_exception(char *message, int code)
+{
+    zend_throw_exception(php_uamqp_exception_ce, message, code);
+}
+
 PHP_MINIT_FUNCTION(uamqp_exception)
 {
     zend_class_entry ce;
