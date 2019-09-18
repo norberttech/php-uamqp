@@ -101,8 +101,8 @@ int callback(char *msg)
 
 METHOD(listen)
 {
-    uamqp_consumer_object *object;
-    uamqp_destination_object *destination;
+    uamqp_consumer_object *consumer_object;
+    php_uamqp_destination_object *destination;
     zval *destination_argument;
 
     listen_method_callback = empty_fcall_info;
@@ -110,15 +110,15 @@ METHOD(listen)
 
     ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2);
         Z_PARAM_FUNC_EX(listen_method_callback, listen_method_callback_cache, 1, 0)
-        Z_PARAM_OBJECT_OF_CLASS_EX(destination_argument, php_uamqp_destination_ce(), 1, 0);
+        Z_PARAM_OBJECT_OF_CLASS_EX(destination_argument, php_uamqp_destination_ce, 1, 0);
     ZEND_PARSE_PARAMETERS_END();
 
-    object = php_uamqp_consumer_fetch_object(Z_OBJ_P(getThis()));
-    destination = UAMQP_DESTINATION_OBJECT(destination_argument);
+    consumer_object = php_uamqp_consumer_fetch_object(Z_OBJ_P(getThis()));
+    destination = php_uamqp_destination_fetch_object(Z_OBJ_P(destination_argument));
 
     uamqp_open_receiver(
-        object->uamqp_connection->uamqp_connection,
-        create_message_receiver(object->uamqp_connection->uamqp_session, ZSTR_VAL(object->uamqp_connection->properties.host), ZSTR_VAL(destination->value), object->settle_mode),
+        consumer_object->uamqp_connection->uamqp_connection,
+        create_message_receiver(consumer_object->uamqp_connection->uamqp_session, ZSTR_VAL(consumer_object->uamqp_connection->properties.host), destination->value, consumer_object->settle_mode),
         callback
     );
 }

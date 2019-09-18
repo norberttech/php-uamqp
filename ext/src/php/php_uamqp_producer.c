@@ -27,21 +27,21 @@ METHOD(sendMessage)
     zval *message_argument;
     zval *destination_argument;
     php_uamqp_message_object *message;
-    uamqp_destination_object *destination;
+    php_uamqp_destination_object *destination;
     uamqp_producer_object *producer;
 
     ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
         Z_PARAM_OBJECT_OF_CLASS_EX(message_argument, php_uamqp_message_ce, 1, 0);
-        Z_PARAM_OBJECT_OF_CLASS_EX(destination_argument, php_uamqp_destination_ce(), 1, 0);
+        Z_PARAM_OBJECT_OF_CLASS_EX(destination_argument, php_uamqp_destination_ce, 1, 0);
     ZEND_PARSE_PARAMETERS_END();
 
     producer = php_uamqp_producer_fetch_object(Z_OBJ_P(getThis()));
     message = php_uamqp_message_fetch_object(Z_OBJ_P(message_argument));
-    destination = UAMQP_DESTINATION_OBJECT(destination_argument);
+    destination = php_uamqp_destination_fetch_object(Z_OBJ_P(destination_argument));
 
     send_message(
         producer->uamqp_connection->uamqp_connection,
-        create_message_sender(producer->uamqp_connection->uamqp_session, ZSTR_VAL(producer->uamqp_connection->properties.host), ZSTR_VAL(destination->value)),
+        create_message_sender(producer->uamqp_connection->uamqp_session, ZSTR_VAL(producer->uamqp_connection->properties.host), destination->value),
         create_message(message->payload)
     );
 }

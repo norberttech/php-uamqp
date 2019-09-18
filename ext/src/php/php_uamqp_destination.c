@@ -1,41 +1,40 @@
 #include <php.h>
 #include <ext/standard/php_var.h>
-#include "../../php_uamqp.h"
+#include <Zend/zend_exceptions.h>
 #include "php_uamqp_destination.h"
+#include "php_uamqp_exception.h"
 
-zend_class_entry *uamqp_destination_ce;
 zend_object_handlers uamqp_destination_object_handlers;
 
-#define this_ce uamqp_destination_ce
 #define METHOD(name) PHP_METHOD(UAMQPDestination, name)
 #define ME(name, arginfo, visibility) PHP_ME(UAMQPDestination, name, arginfo, visibility)
 
-zend_class_entry *php_uamqp_destination_ce(void)
-{
-    return uamqp_destination_ce;
-}
-
 METHOD(__construct)
 {
-    zend_string *destination_value;
-    uamqp_destination_object *object;
+    char *destination;
+    size_t destination_length;
+    php_uamqp_destination_object *destination_object;
 
     ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-        Z_PARAM_STR_EX(destination_value, 1, 0)
+        Z_PARAM_STRING_EX(destination, destination_length, 1, 1)
     ZEND_PARSE_PARAMETERS_END();
 
-    object = UAMQP_DESTINATION_OBJECT(getThis());
+    destination_object = php_uamqp_destination_fetch_object(Z_OBJ_P(getThis()));
 
-    object->value = zend_string_copy(destination_value);
+    if (destination_length > 64500) {
+        zend_throw_exception(php_uamqp_exception_ce(), "Destination can't be longer than 64500 characters.", 0);
+    }
+
+    destination_object->value = estrdup(destination);
 }
 
 METHOD(value)
 {
     zend_parse_parameters_none();
 
-    uamqp_destination_object *destination = UAMQP_DESTINATION_OBJECT(getThis());
+    php_uamqp_destination_object *destination_object = php_uamqp_destination_fetch_object(Z_OBJ_P(getThis()));
 
-    RETVAL_STR(destination->value);
+    RETURN_STRING(destination_object->value);
 }
 
 ZEND_BEGIN_ARG_INFO_EX(destination_construct_arginfo, 0, 0, 1)
@@ -53,7 +52,7 @@ zend_function_entry uamqp_destination_class_functions[] = {
 
 zend_object *uamqp_destination_handler_create(zend_class_entry *ce)
 {
-    uamqp_destination_object *destination = ecalloc(1, sizeof(uamqp_destination_object) + zend_object_properties_size(ce));
+    php_uamqp_destination_object *destination = ecalloc(1, sizeof(php_uamqp_destination_object) + zend_object_properties_size(ce));
 
     zend_object_std_init(&destination->zendObject, ce);
     object_properties_init(&destination->zendObject, ce);
@@ -64,31 +63,28 @@ zend_object *uamqp_destination_handler_create(zend_class_entry *ce)
 
 void uamqp_destination_object_handler_free(zend_object *object)
 {
-    uamqp_destination_object *destination = php_uamqp_destination_fetch_object(object);
+    php_uamqp_destination_object *destination = php_uamqp_destination_fetch_object(object);
 
-    zend_string_release(destination->value);
+    efree(destination->value);
     zend_object_std_dtor(&destination->zendObject);
 }
 
 static HashTable* uamqp_destination_object_debug_info(zval *obj, int *is_temp)
 {
-    uamqp_destination_object *destination = php_uamqp_destination_fetch_object(Z_OBJ_P(obj));
-    zval tmp;
-    zend_string *destination_key;
-    HashTable *debug_info;
+    zval ary;
+    php_uamqp_destination_object *destination = php_uamqp_destination_fetch_object(Z_OBJ_P(obj));
 
     *is_temp = 1;
 
-    ALLOC_HASHTABLE(debug_info);
-    zend_hash_init(debug_info, 1, NULL, ZVAL_PTR_DTOR, 0);
+    array_init(&ary);
 
-    ZVAL_STR(&tmp, destination->value);
-    destination_key = zend_string_init("destination", sizeof("destination") - 1, 0);
-    zend_hash_update(debug_info, destination_key, &tmp);
-    zend_string_release(destination_key);
-    zval_dtor(&tmp);
+    if (!destination) {
+        return Z_ARRVAL(ary);
+    }
 
-    return debug_info;
+    add_assoc_string(&ary, "destination", destination->value);
+
+    return Z_ARRVAL(ary);
 }
 
 PHP_MINIT_FUNCTION(uamqp_destination) {
@@ -98,10 +94,10 @@ PHP_MINIT_FUNCTION(uamqp_destination) {
 
     ce.create_object = uamqp_destination_handler_create;
 
-    this_ce = zend_register_internal_class(&ce);
+    php_uamqp_destination_ce = zend_register_internal_class(&ce);
 
     memcpy(&uamqp_destination_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-    uamqp_destination_object_handlers.offset = XtOffsetOf(uamqp_destination_object, zendObject);
+    uamqp_destination_object_handlers.offset = XtOffsetOf(php_uamqp_destination_object, zendObject);
     uamqp_destination_object_handlers.get_debug_info = uamqp_destination_object_debug_info;
     uamqp_destination_object_handlers.free_obj = uamqp_destination_object_handler_free;
 
