@@ -9,9 +9,9 @@ zend_class_entry *php_uamqp_producer_ce;
 
 typedef struct _uamqp_producer_object {
     php_uamqp_connection_object *uamqp_connection;
-    zend_object zendObject;
+    zend_object producer_zend_object;
 } uamqp_producer_object;
 
 static inline uamqp_producer_object *php_uamqp_producer_fetch_object(zend_object *obj) {
-    return (uamqp_producer_object *)((char*)(obj) - XtOffsetOf(uamqp_producer_object, zendObject));
+    return (uamqp_producer_object *)((char*)(obj) - XtOffsetOf(uamqp_producer_object, producer_zend_object));
 }

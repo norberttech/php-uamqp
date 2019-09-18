@@ -21,14 +21,14 @@ static void on_connection_closed_received(void* context, ERROR_HANDLE error)
     php_uamqp_throw_exception((char*) description, 0);
 }
 
-struct uamqp create_uamqp_connection(char *host, int port, char *policyName, char *policyKey)
+struct uamqp create_uamqp_connection(char *host, int port, char *policy_name, char *policy_key)
 {
     struct uamqp connection;
 
     const IO_INTERFACE_DESCRIPTION* tlsio_interface;
     TLSIO_CONFIG tls_io_config = { host, port };
     SASLCLIENTIO_CONFIG sasl_io_config;
-    SASL_PLAIN_CONFIG sasl_plain_config = {policyName, policyKey, NULL };
+    SASL_PLAIN_CONFIG sasl_plain_config = {policy_name, policy_key, NULL };
 
     if (platform_init() != 0) {
         php_uamqp_throw_exception("UAQMP platform already initialized", 0);

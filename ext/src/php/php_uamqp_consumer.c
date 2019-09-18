@@ -142,11 +142,11 @@ zend_object *uamqp_consumer_handler_create(zend_class_entry *ce)
 {
     uamqp_consumer_object *consumer = ecalloc(1, sizeof(uamqp_consumer_object) + zend_object_properties_size(ce));
 
-    zend_object_std_init(&consumer->zendObject, ce);
-    object_properties_init(&consumer->zendObject, ce);
-    consumer->zendObject.handlers = &uamqp_consumer_object_handlers;
+    zend_object_std_init(&consumer->consumer_zend_object, ce);
+    object_properties_init(&consumer->consumer_zend_object, ce);
+    consumer->consumer_zend_object.handlers = &uamqp_consumer_object_handlers;
 
-    return &consumer->zendObject;
+    return &consumer->consumer_zend_object;
 }
 
 void uamqp_consumer_object_handler_free(zend_object *object)
@@ -154,7 +154,7 @@ void uamqp_consumer_object_handler_free(zend_object *object)
     uamqp_consumer_object *consumer = php_uamqp_consumer_fetch_object(object);
 
     consumer->uamqp_connection = NULL;
-    zend_object_std_dtor(&consumer->zendObject);
+    zend_object_std_dtor(&consumer->consumer_zend_object);
 }
 
 PHP_MINIT_FUNCTION(uamqp_consumer) {
@@ -173,7 +173,7 @@ PHP_MINIT_FUNCTION(uamqp_consumer) {
     zend_declare_class_constant_long(php_uamqp_consumer_ce, ZEND_STRL("ACCEPT_STOP"), RECEIVER_ACCEPT_STOP);
 
     memcpy(&uamqp_consumer_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-    uamqp_consumer_object_handlers.offset = XtOffsetOf(uamqp_consumer_object, zendObject);
+    uamqp_consumer_object_handlers.offset = XtOffsetOf(uamqp_consumer_object, consumer_zend_object);
     uamqp_consumer_object_handlers.free_obj = uamqp_consumer_object_handler_free;
 
     return SUCCESS;

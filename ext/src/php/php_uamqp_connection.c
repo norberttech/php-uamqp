@@ -28,10 +28,10 @@ METHOD(__construct)
 
     connection_object->properties.host = estrdup(host);
     connection_object->properties.port = port;
-    connection_object->properties.policyName = estrdup(policy_name);
-    connection_object->properties.policyKey = estrdup(policy_key);
+    connection_object->properties.policy_name = estrdup(policy_name);
+    connection_object->properties.policy_key = estrdup(policy_key);
 
-    connection_object->uamqp_connection = create_uamqp_connection(connection_object->properties.host, (int) connection_object->properties.port, connection_object->properties.policyName, connection_object->properties.policyKey);
+    connection_object->uamqp_connection = create_uamqp_connection(connection_object->properties.host, (int) connection_object->properties.port, connection_object->properties.policy_name, connection_object->properties.policy_key);
     connection_object->uamqp_session = create_uamqp_session(connection_object->uamqp_connection);
 }
 
@@ -79,7 +79,7 @@ METHOD(policyName)
 
     php_uamqp_connection_object *object = php_uamqp_connection_fetch_object(Z_OBJ_P(getThis()));
 
-    RETURN_STRING(object->properties.policyName);
+    RETURN_STRING(object->properties.policy_name);
 }
 
 METHOD(policyKey)
@@ -88,7 +88,7 @@ METHOD(policyKey)
 
     php_uamqp_connection_object *object = php_uamqp_connection_fetch_object(Z_OBJ_P(getThis()));
 
-    RETURN_STRING(object->properties.policyKey);
+    RETURN_STRING(object->properties.policy_key);
 }
 
 ZEND_BEGIN_ARG_INFO_EX(connection_construct_arginfo, 0, 0, 4)
@@ -122,11 +122,11 @@ zend_object *uamqp_object_handler_create(zend_class_entry *ce)
 {
     php_uamqp_connection_object *connection = ecalloc(1, sizeof(php_uamqp_connection_object) + zend_object_properties_size(ce));
 
-    zend_object_std_init(&connection->zendObject, ce);
-    object_properties_init(&connection->zendObject, ce);
-    connection->zendObject.handlers = &uamqp_connection_object_handlers;
+    zend_object_std_init(&connection->connection_zend_object, ce);
+    object_properties_init(&connection->connection_zend_object, ce);
+    connection->connection_zend_object.handlers = &uamqp_connection_object_handlers;
 
-    return &connection->zendObject;
+    return &connection->connection_zend_object;
 }
 
 void uamqp_connection_object_handler_free(zend_object *object)
@@ -135,9 +135,9 @@ void uamqp_connection_object_handler_free(zend_object *object)
 
     destroy_connection(&connection->uamqp_connection, &connection->uamqp_session);
     efree(connection->properties.host);
-    efree(connection->properties.policyKey);
-    efree(connection->properties.policyName);
-    zend_object_std_dtor(&connection->zendObject);
+    efree(connection->properties.policy_key);
+    efree(connection->properties.policy_name);
+    zend_object_std_dtor(&connection->connection_zend_object);
 }
 
 PHP_MINIT_FUNCTION(uamqp_connection) {
@@ -150,7 +150,7 @@ PHP_MINIT_FUNCTION(uamqp_connection) {
     php_uamqp_connection_ce = zend_register_internal_class(&connection_ce);
 
     memcpy(&uamqp_connection_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-    uamqp_connection_object_handlers.offset = XtOffsetOf(php_uamqp_connection_object, zendObject);
+    uamqp_connection_object_handlers.offset = XtOffsetOf(php_uamqp_connection_object, connection_zend_object);
     uamqp_connection_object_handlers.free_obj = uamqp_connection_object_handler_free;
 
     return SUCCESS;

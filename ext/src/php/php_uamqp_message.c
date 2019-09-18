@@ -52,11 +52,11 @@ zend_object *uamqp_message_handler_create(zend_class_entry *ce)
 {
     php_uamqp_message_object *message = ecalloc(1, sizeof(php_uamqp_message_object) + zend_object_properties_size(ce));
 
-    zend_object_std_init(&message->zendObject, ce);
-    object_properties_init(&message->zendObject, ce);
-    message->zendObject.handlers = &uamqp_message_object_handlers;
+    zend_object_std_init(&message->message_zend_object, ce);
+    object_properties_init(&message->message_zend_object, ce);
+    message->message_zend_object.handlers = &uamqp_message_object_handlers;
 
-    return &message->zendObject;
+    return &message->message_zend_object;
 }
 
 void uamqp_message_object_handler_free(zend_object *object)
@@ -64,7 +64,7 @@ void uamqp_message_object_handler_free(zend_object *object)
     php_uamqp_message_object *message = php_uamqp_message_fetch_object(object);
 
     efree(message->payload);
-    zend_object_std_dtor(&message->zendObject);
+    zend_object_std_dtor(&message->message_zend_object);
 }
 
 static HashTable* uamqp_message_object_debug_info(zval *obj, int *is_temp)
@@ -95,7 +95,7 @@ PHP_MINIT_FUNCTION(uamqp_message) {
     php_uamqp_message_ce = zend_register_internal_class(&ce);
 
     memcpy(&uamqp_message_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-    uamqp_message_object_handlers.offset = XtOffsetOf(php_uamqp_message_object, zendObject);
+    uamqp_message_object_handlers.offset = XtOffsetOf(php_uamqp_message_object, message_zend_object);
     uamqp_message_object_handlers.get_debug_info = uamqp_message_object_debug_info;
     uamqp_message_object_handlers.free_obj = uamqp_message_object_handler_free;
 
