@@ -65,55 +65,55 @@ UAMQP\Producer::sendMessage(UAMQP\Message $message, UAMQP\Destination $destinati
 ```php
 const \UAMQP\Receiver::RECEIVE_AND_DELETE = 0;
 const \UAMQP\Receiver::PEAK_AND_LOCK = 1;
-const \UAMQP\Receiver::ACCEPT_NEXT = 2;
-const \UAMQP\Receiver::STOP = 3;
-const \UAMQP\Receiver::ACCEPT_STOP = 4;
 
 \UAMQP\Consumer::__construct(\UAMQP\Connection $message)
 
-\UAMQP\Consumer::listen(callable $callback, \UAMQP\Destination $destination, int $settleMode = \UAMQP\Receiver::RECEIVE_AND_DELETE) : void
+\UAMQP\Consumer::open(\UAMQP\Destination $destination, int $settleMode = \UAMQP\Receiver::RECEIVE_AND_DELETE) : void
+UAMQP\Consumer::receive() : void
+UAMQP\Consumer::accept() : void
+UAMQP\Consumer::release() : void
+UAMQP\Consumer::reject(string $errorCondition, string $errorDescription) : void
+UAMQP\Consumer::close() : void
+```
 
-$callback = function(UAMQP\Message $message) {
-    return true; // \UAMQP\Receiver::RECEIVE_AND_DELETE - receive more
-}
+## Examples
 
-$callback = function(UAMQP\Message $message) {
-    return false; // \UAMQP\Receiver::RECEIVE_AND_DELETE - stop receiving
-}
+Opening connection, creating producer, publishing couple messages and consuming 
+them with consumer in `RECEIVE_AND_DELETE` settle mode (messages deleted when received).
 
-$callback = function(UAMQP\Message $message) {
-    return UAMQP\Receiver::ACCEPT_NEXT; // UAMQP\Receiver::RECEIVE_AND_DELETE- receive more
-}
+```php
+<?php
 
-$callback = function(UAMQP\Message $message) {
-    return UAMQP\Receiver::STOP; // UAMQP\Receiver::RECEIVE_AND_DELETE - stop receiving
-}
+$connection = new \UAMQP\Connection(getenv('PHP_UAMQP_TEST_SB_HOST'), 5671, getenv('PHP_UAMQP_TEST_SB_POLICY_NAME'), getenv('PHP_UAMQP_TEST_SB_POLICY_KEY'));
 
-$callback = function(UAMQP\Message $message) {
-    throw new \RuntimeException(); // UAMQP\Receiver::RECEIVE_AND_DELETE - stop receiving
-}
+$producer = new \UAMQP\Producer($connection);
+$destination = new \UAMQP\Destination(getenv('PHP_UAMQP_TEST_SB_DESTINATION'));
 
-$callback = function(UAMQP\Message $message) {
-    return true; // UAMQP\Receiver::PEAK_AND_LOCK - accept message and receive more
-}
+$producer->sendMessage(new \UAMQP\Message($payload = "this is some random test message 1 " . time()), $destination);
+$producer->sendMessage(new \UAMQP\Message($payload = "this is some random test message 2 " . time()), $destination);
+$producer->sendMessage(new \UAMQP\Message($payload = "this is some random test message 3 " . time()), $destination);
+$producer->sendMessage(new \UAMQP\Message($payload = "this is some random test message 4 " . time()), $destination);
 
-$callback = function(UAMQP\Message $message) {
-    return false; // UAMQP\Receiver::PEAK_AND_LOCK - accept message and not receive more
-}
+$consumer = new \UAMQP\Consumer($connection, \UAMQP\Consumer::RECEIVE_AND_DELETE);
 
-$callback = function(UAMQP\Message $message) {
-    return UAMQP\Receiver::ACCEPT_NEXT; // UAMQP\Receiver::PEAK_AND_LOCK - accept message and receive more
-}
+$i = 0;
 
-$callback = function(UAMQP\Message $message) {
-    return UAMQP\Receiver::ACCEPT_STOP; // UAMQP\Receiver::PEAK_AND_LOCK - accept message and not receive more
-}
+$consumer->open($destination);
 
-$callback = function(UAMQP\Message $message) {
-    return UAMQP\Receiver::STOP; // UAMQP\Receiver::PEAK_AND_LOCK - rlease message and not receive more
-}
+for ($t = 0; $t < 10; $t++) {
+    $message = $consumer->receive();
 
-$callback = function(UAMQP\Message $message) {
-    throw new \RuntimeException(); // UAMQP\Receiver::PEAK_AND_LOCK - rlease message and not receive more
+    if ($message) {
+        $i++;
+        var_dump($i, $message);
+
+        continue ;
+    }
+
+    if ($i >= 4) {
+        break;
+    }
+
+    usleep(250000);
 }
 ```

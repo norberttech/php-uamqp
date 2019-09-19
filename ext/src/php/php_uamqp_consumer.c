@@ -190,7 +190,7 @@ ZEND_BEGIN_ARG_INFO_EX(consumer_construct_arginfo, 0, 0, 2)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(consumer_open_arginfo, 0, 0, 1)
-    ZEND_ARG_OBJ_INFO(0, message, UAMQP\\Destination, 0)
+    ZEND_ARG_OBJ_INFO(0, destination, UAMQP\\Destination, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(consumer_reject_arginfo, 0, 0, 2)
