@@ -1,5 +1,6 @@
 #include <php.h>
 #include <ext/standard/php_var.h>
+#include "php_uamqp.h"
 #include "php_uamqp_destination.h"
 #include "php_uamqp_exception.h"
 
@@ -53,11 +54,11 @@ zend_object *uamqp_destination_handler_create(zend_class_entry *ce)
 {
     php_uamqp_destination_object *destination = ecalloc(1, sizeof(php_uamqp_destination_object) + zend_object_properties_size(ce));
 
-    zend_object_std_init(&destination->destination_zend_object, ce);
-    object_properties_init(&destination->destination_zend_object, ce);
-    destination->destination_zend_object.handlers = &uamqp_destination_object_handlers;
+    zend_object_std_init(&destination->std, ce);
+    object_properties_init(&destination->std, ce);
+    destination->std.handlers = &uamqp_destination_object_handlers;
 
-    return &destination->destination_zend_object;
+    return &destination->std;
 }
 
 void uamqp_destination_object_handler_free(zend_object *object)
@@ -65,7 +66,7 @@ void uamqp_destination_object_handler_free(zend_object *object)
     php_uamqp_destination_object *destination = php_uamqp_destination_fetch_object(object);
 
     efree(destination->value);
-    zend_object_std_dtor(&destination->destination_zend_object);
+    zend_object_std_dtor(&destination->std);
 }
 
 static HashTable* uamqp_destination_object_debug_info(zval *obj, int *is_temp)
@@ -96,7 +97,7 @@ PHP_MINIT_FUNCTION(uamqp_destination) {
     php_uamqp_destination_ce = zend_register_internal_class(&ce);
 
     memcpy(&uamqp_destination_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-    uamqp_destination_object_handlers.offset = XtOffsetOf(php_uamqp_destination_object, destination_zend_object);
+    uamqp_destination_object_handlers.offset = XtOffsetOf(php_uamqp_destination_object, std);
     uamqp_destination_object_handlers.get_debug_info = uamqp_destination_object_debug_info;
     uamqp_destination_object_handlers.free_obj = uamqp_destination_object_handler_free;
 

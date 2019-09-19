@@ -1,5 +1,6 @@
 #include <php.h>
 #include <Zend/zend_exceptions.h>
+#include "php_uamqp.h"
 #include "php_uamqp_exception.h"
 
 void php_uamqp_throw_exception(char *message, int code)

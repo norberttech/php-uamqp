@@ -48,7 +48,7 @@ static PHP_MINIT_FUNCTION(uamqp)
 
 zend_module_entry uamqp_module_entry = {
     STANDARD_MODULE_HEADER,
-    "uamqp",               /* Extension name */
+    PHP_UAMQP_EXTNAME,            /* Extension name */
     uamqp_functions,              /* zend_function_entry */
     PHP_MINIT(uamqp),             /* PHP_MINIT - Module initialization */
     NULL,    /* PHP_MSHUTDOWN - Module shutdown */

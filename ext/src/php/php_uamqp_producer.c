@@ -1,5 +1,6 @@
 #include <php.h>
 #include <ext/standard/php_var.h>
+#include "php_uamqp.h"
 #include "php_uamqp_producer.h"
 #include "php_uamqp_destination.h"
 #include "php_uamqp_message.h"
@@ -65,11 +66,11 @@ zend_object *uamqp_producer_handler_create(zend_class_entry *ce)
 {
     uamqp_producer_object *producer = ecalloc(1, sizeof(uamqp_producer_object) + zend_object_properties_size(ce));
 
-    zend_object_std_init(&producer->producer_zend_object, ce);
-    object_properties_init(&producer->producer_zend_object, ce);
-    producer->producer_zend_object.handlers = &uamqp_producer_object_handlers;
+    zend_object_std_init(&producer->std, ce);
+    object_properties_init(&producer->std, ce);
+    producer->std.handlers = &uamqp_producer_object_handlers;
 
-    return &producer->producer_zend_object;
+    return &producer->std;
 }
 
 void uamqp_producer_object_handler_free(zend_object *object)
@@ -77,7 +78,7 @@ void uamqp_producer_object_handler_free(zend_object *object)
     uamqp_producer_object *producer = php_uamqp_producer_fetch_object(object);
 
     producer->uamqp_connection = NULL;
-    zend_object_std_dtor(&producer->producer_zend_object);
+    zend_object_std_dtor(&producer->std);
 }
 
 PHP_MINIT_FUNCTION(uamqp_producer) {
@@ -90,7 +91,7 @@ PHP_MINIT_FUNCTION(uamqp_producer) {
     php_uamqp_producer_ce = zend_register_internal_class(&ce_producer);
 
     memcpy(&uamqp_producer_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-    uamqp_producer_object_handlers.offset = XtOffsetOf(uamqp_producer_object, producer_zend_object);
+    uamqp_producer_object_handlers.offset = XtOffsetOf(uamqp_producer_object, std);
     uamqp_producer_object_handlers.free_obj = uamqp_producer_object_handler_free;
 
     return SUCCESS;
