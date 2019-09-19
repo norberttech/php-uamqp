@@ -2,9 +2,9 @@
 UAMQP\Connection basic properties
 --SKIPIF--
 <?php
-if (!extension_loaded('uamqp')) {
+//if (!extension_loaded('uamqp')) {
 	echo 'skip';
-}
+//}
 ?>
 --FILE--
 <?php

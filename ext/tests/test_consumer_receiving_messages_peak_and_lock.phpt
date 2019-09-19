@@ -2,9 +2,9 @@
 General test that is going to send couple of messages into the destination through \UAMQP\Producer and receive them using \UAMQP\Consumer
 --SKIPIF--
 <?php
-if (!extension_loaded('uamqp')) {
+//if (!extension_loaded('uamqp')) {
 	echo 'skip';
-}
+//}
 
 if (!getenv('PHP_UAMQP_TEST_SB_POLICY_NAME')) {
     echo 'skip';

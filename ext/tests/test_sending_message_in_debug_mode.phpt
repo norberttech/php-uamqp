@@ -26,11 +26,23 @@ $destination = new \UAMQP\Destination(getenv('PHP_UAMQP_TEST_SB_DESTINATION'));
 
 $producer->sendMessage(new \UAMQP\Message($payload = "this is some random test message 1 " . time()), $destination);
 
-$consumer = new \UAMQP\Consumer($connection, \UAMQP\Consumer::RECEIVE_AND_DELETE);
+$consumer = new \UAMQP\Consumer($connection, \UAMQP\Consumer::PEAK_AND_LOCK);
 
-$consumer->listen(function($message){
-    return \UAMQP\Consumer::STOP;
-}, $destination);
+$consumer->open($destination);
+for ($i = 0; $i < 10; $i++) {
+    $message = $consumer->receive();
+
+    if ($message) {
+        var_dump($message);
+
+        $consumer->reject("Failure", "Receiving Message Failed");
+        return ;
+    }
+
+    sleep(1);
+}
+
+$consumer->close();
 
 
 ?>

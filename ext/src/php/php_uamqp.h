@@ -35,8 +35,9 @@ typedef struct _uamqp_producer_object {
 } uamqp_producer_object;
 
 typedef struct _uamqp_consumer_object {
-    php_uamqp_connection_object *uamqp_connection;
     long settle_mode;
+    struct uamqp_message_receiver uamqp_receiver;
+    php_uamqp_connection_object *uamqp_connection;
     zend_object std;
 } uamqp_consumer_object;
 
