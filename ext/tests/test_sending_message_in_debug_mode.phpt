@@ -50,10 +50,11 @@ $consumer->close();
 <- [OPEN]* {%s,NULL,65536,4999,240000,NULL,NULL,NULL,NULL,NULL}
 -> [BEGIN]* {NULL,0,2147483647,65536,4294967295}
 <- [BEGIN]* {0,1,5000,2147483647,255,NULL,NULL,NULL}
--> [ATTACH]* {sender-link,0,false,1,0,* {ingress},* {amqps://%s},NULL,NULL,0,65536}
-<- [ATTACH]* {sender-link,0,true,1,0,* {ingress,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL},* {amqps://%s,NULL,NULL,NULL,NULL,NULL,NULL},NULL,NULL,NULL,65536,NULL,NULL,NULL}
+-> [ATTACH]* {sender-link,0,false,0,0,* {ingress},* {amqps://%s},NULL,NULL,0,65536}
+<- [ATTACH]* {sender-link,0,true,0,0,* {ingress,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL},* {amqps://%s,NULL,NULL,NULL,NULL,NULL,NULL},NULL,NULL,NULL,65536,NULL,NULL,NULL}
 <- [FLOW]* {0,5000,1,2147483647,0,0,1000,0,NULL,false,NULL}
--> [TRANSFER]* {0,0,<01 00 00 00>,0,true,false}
+-> [TRANSFER]* {0,0,<01 00 00 00>,0,false,false}
+<- [DISPOSITION]* {true,0,NULL,true,* {},NULL}
 -> [DETACH]* {0,true}
 -> [ATTACH]* {receiver-link,1,true,0,0,* {amqps://%s},* {ingress-rx},NULL,NULL,NULL,0}
 <- [DETACH]* {0,true,NULL}

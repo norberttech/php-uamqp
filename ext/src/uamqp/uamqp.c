@@ -122,7 +122,7 @@ struct uamqp_message_sender create_message_sender(struct uamqp_session uamqp_ses
     target = messaging_create_target(uamqpHost);
 
     sender.link = link_create(uamqp_session.session, "sender-link", role_sender, source, target);
-    link_set_snd_settle_mode(sender.link, sender_settle_mode_settled);
+    link_set_snd_settle_mode(sender.link, sender_settle_mode_unsettled);
     (void)link_set_max_message_size(sender.link , 65536);
     link_subscribe_on_link_detach_received(sender.link, on_link_detach_received_producer, uamqp_session.session);
 
