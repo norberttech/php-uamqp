@@ -1,3 +1,4 @@
+#pragma once
 #include <azure_uamqp_c/uamqp.h>
 
 struct uamqp {

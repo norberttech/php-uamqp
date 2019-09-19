@@ -1,4 +1,4 @@
-#include "php_uamqp.h"
+#pragma once
 #include "../uamqp/uamqp.h"
 
 PHP_MINIT_FUNCTION(uamqp_connection);

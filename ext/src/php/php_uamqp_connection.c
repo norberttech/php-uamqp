@@ -1,6 +1,7 @@
 #include <php.h>
 #include <azure_uamqp_c/uamqp.h>
 #include "php_uamqp_connection.h"
+#include "php_uamqp.h"
 
 #define PHP_UAMQP_CONNECTION_CLASS "Connection"
 
