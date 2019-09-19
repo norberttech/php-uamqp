@@ -215,6 +215,9 @@ struct uamqp_message_receiver create_message_receiver(struct uamqp_session *uamq
     target = messaging_create_target("ingress-rx");
     receiver.link = link_create(uamqp_session->session, "receiver-link", role_receiver, source, target); // @TODO: Replace link name with uuid
 
+    // how many messages consumer can handle during one work cycle
+    link_set_max_link_credit(receiver.link, 1);
+
     if (settle_mode == RECEIVE_AND_DELETE) {
         link_set_rcv_settle_mode(receiver.link, receiver_settle_mode_first);
     }
@@ -224,6 +227,7 @@ struct uamqp_message_receiver create_message_receiver(struct uamqp_session *uamq
     } else {
         link_set_rcv_settle_mode(receiver.link, receiver_settle_mode_first); // use receive and delete as a default
     }
+
 
     amqpvalue_destroy(source);
     amqpvalue_destroy(target);
@@ -248,14 +252,14 @@ char * uamqp_pull_last_message()
 
 void uamqp_close_receiver(struct uamqp_message_receiver *uamqp_message_receiver)
 {
-    messagereceiver_destroy(uamqp_message_receiver->message_receiver);
-    link_destroy(uamqp_message_receiver->link);
-    uamqp_message_receiver->state = RECEIVER_CLOSED;
-
     if (_last_message) {
         efree(_last_message);
         _last_message = NULL;
     }
+
+    messagereceiver_destroy(uamqp_message_receiver->message_receiver);
+    link_destroy(uamqp_message_receiver->link);
+    uamqp_message_receiver->state = RECEIVER_CLOSED;
 }
 
 void uamqp_receiver_accept_last_message(struct uamqp_message_receiver *uamqp_message_receiver)

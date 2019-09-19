@@ -2,9 +2,9 @@
 General test that is going to send couple of messages into the destination through \UAMQP\Producer and receive them using \UAMQP\Consumer
 --SKIPIF--
 <?php
-//if (!extension_loaded('uamqp')) {
+if (!extension_loaded('uamqp')) {
 	echo 'skip';
-//}
+}
 
 if (!getenv('PHP_UAMQP_TEST_SB_POLICY_NAME')) {
     echo 'skip';
@@ -32,17 +32,24 @@ $consumer = new \UAMQP\Consumer($connection, \UAMQP\Consumer::RECEIVE_AND_DELETE
 
 $i = 0;
 
-$consumer->listen(function($message) use (&$i) {
-    $i++;
+$consumer->open($destination);
 
-    var_dump($i, $message);
+for ($t = 0; $t < 10; $t++) {
+    $message = $consumer->receive();
 
-    if ($i >= 4) {
-        return false;
+    if ($message) {
+        $i++;
+        var_dump($i, $message);
+
+        continue ;
     }
 
-    return true;
-}, $destination);
+    if ($i >= 4) {
+        break;
+    }
+
+    usleep(250000);
+}
 
 ?>
 --EXPECTF--

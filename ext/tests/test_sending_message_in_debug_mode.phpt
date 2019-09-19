@@ -26,20 +26,17 @@ $destination = new \UAMQP\Destination(getenv('PHP_UAMQP_TEST_SB_DESTINATION'));
 
 $producer->sendMessage(new \UAMQP\Message($payload = "this is some random test message 1 " . time()), $destination);
 
-$consumer = new \UAMQP\Consumer($connection, \UAMQP\Consumer::PEAK_AND_LOCK);
+$consumer = new \UAMQP\Consumer($connection, \UAMQP\Consumer::RECEIVE_AND_DELETE);
 
 $consumer->open($destination);
 for ($i = 0; $i < 10; $i++) {
     $message = $consumer->receive();
 
     if ($message) {
-        var_dump($message);
-
-        $consumer->reject("Failure", "Receiving Message Failed");
         return ;
     }
 
-    sleep(1);
+    usleep(250000);
 }
 
 $consumer->close();
@@ -61,8 +58,9 @@ $consumer->close();
 -> [ATTACH]* {receiver-link,1,true,0,0,* {amqps://%s},* {ingress-rx},NULL,NULL,NULL,0}
 <- [DETACH]* {0,true,NULL}
 <- [ATTACH]* {receiver-link,0,false,0,1,* {amqps://%s,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL},* {ingress-rx,NULL,NULL,NULL,NULL,NULL,NULL},NULL,NULL,0,18446744073709551615,NULL,NULL,NULL}
--> [FLOW]* {1,2147483647,1,65535,1,0,10000}
+-> [FLOW]* {1,2147483647,1,65535,1,0,1}
 <- [TRANSFER]* {0,0,<%s>,0,NULL,false,NULL,NULL,NULL,NULL,true}
+-> [FLOW]* {2,2147483646,1,65535,1,1,1}
 -> [DISPOSITION]* {true,0,0,true,* {}}
 -> [DETACH]* {1,true}
 -> [END]* {}
