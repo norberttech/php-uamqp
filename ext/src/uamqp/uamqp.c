@@ -9,7 +9,6 @@
 #include <azure_uamqp_c/sasl_mssbcbs.h>
 #include <azure_uamqp_c/sasl_plain.h>
 #include <azure_uamqp_c/session.h>
-#include <Zend/zend_exceptions.h>
 #include "uamqp.h"
 #include "../php/php_uamqp_exception.h"
 
@@ -19,20 +18,20 @@ static void on_connection_closed_received(void* context, ERROR_HANDLE error)
     const char* description = NULL;
     error_get_description(error, &description);
 
-    zend_throw_exception(php_uamqp_exception_ce(), description, 0);
+    php_uamqp_throw_exception((char*) description, 0);
 }
 
-struct uamqp create_uamqp_connection(char *host, int port, char *policyName, char *policyKey)
+struct uamqp create_uamqp_connection(char *host, int port, char *policy_name, char *policy_key)
 {
     struct uamqp connection;
 
     const IO_INTERFACE_DESCRIPTION* tlsio_interface;
     TLSIO_CONFIG tls_io_config = { host, port };
     SASLCLIENTIO_CONFIG sasl_io_config;
-    SASL_PLAIN_CONFIG sasl_plain_config = {policyName, policyKey, NULL };
+    SASL_PLAIN_CONFIG sasl_plain_config = {policy_name, policy_key, NULL };
 
     if (platform_init() != 0) {
-        zend_throw_exception(php_uamqp_exception_ce(), "UAQMP platform already initialized", 0);
+        php_uamqp_throw_exception("UAQMP platform already initialized", 0);
     }
 
     // Create TLS IO
@@ -46,7 +45,7 @@ struct uamqp create_uamqp_connection(char *host, int port, char *policyName, cha
     connection.sasl_io = xio_create(saslclientio_get_interface_description(), &sasl_io_config);
 
     if (connection.sasl_io == NULL) {
-        zend_throw_exception(php_uamqp_exception_ce(), "Connection SASL IO Error", 0);
+        php_uamqp_throw_exception("Connection SASL IO Error", 0);
     }
 
     connection.connection = connection_create(connection.sasl_io, host, "php-uaqmp-binding", NULL, NULL);
@@ -102,7 +101,7 @@ static void on_link_detach_received_producer(void* context, ERROR_HANDLE error)
     error_get_condition(error, &condition);
     error_get_description(error, &description);
 
-    zend_throw_exception(php_uamqp_exception_ce(), description, 0);
+    php_uamqp_throw_exception((char*) description, 0);
 }
 
 struct uamqp_message_sender create_message_sender(struct uamqp_session uamqp_session, char *host, char *destination)
@@ -128,7 +127,7 @@ struct uamqp_message_sender create_message_sender(struct uamqp_session uamqp_ses
     sender.message_sender = messagesender_create(sender.link, NULL, NULL);
 
     if (sender.message_sender == NULL) {
-        zend_throw_exception(php_uamqp_exception_ce(), "Failed to initialize message sender.", 0);
+        php_uamqp_throw_exception("Failed to initialize message sender.", 0);
     }
 
     return sender;
@@ -162,7 +161,7 @@ static void on_message_send_complete(void* context, MESSAGE_SEND_RESULT send_res
 void send_message(struct uamqp uamqp_connection, struct uamqp_message_sender uamqp_messag_sender, struct uamqp_message uamqp_message)
 {
     if (messagesender_open(uamqp_messag_sender.message_sender) != 0) {
-        zend_throw_exception(php_uamqp_exception_ce(), "Failed to open message sender.", 0);
+        php_uamqp_throw_exception("Failed to open message sender.", 0);
     }
 
     (void) messagesender_send_async(uamqp_messag_sender.message_sender, uamqp_message.message, on_message_send_complete, uamqp_message.message, 5000);
