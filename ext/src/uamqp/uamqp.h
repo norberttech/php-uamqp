@@ -1,5 +1,12 @@
 #include <azure_uamqp_c/uamqp.h>
 
+enum UAMQP_CONSTS {
+    PHP_UAMQP_AMQPS_PORT = 5671,
+    // PHP_UAMQP_MAX_PARTITION_KEY_LENGTH = 128,
+    PHP_UAMQP_MAX_MESSAGE_LENGTH_BYTES = 1048576, //1024 * 1024;
+    PHP_UAMQP_MAX_FRAME_SIZE_BYTES = 65536 // 64 * 1024
+};
+
 struct uamqp {
     CONNECTION_HANDLE connection;
     XIO_HANDLE tls_io;

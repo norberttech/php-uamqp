@@ -2,6 +2,7 @@
 #include <azure_uamqp_c/uamqp.h>
 #include "php_uamqp_connection.h"
 #include "php_uamqp.h"
+#include "php_uamqp_exception.h"
 
 #define METHOD(name) PHP_METHOD(UAMQPConnection, name)
 #define ME(name, arginfo, visibility) PHP_ME(UAMQPConnection, name, arginfo, visibility)
@@ -12,7 +13,7 @@ METHOD(__construct)
 {
     char *host, *policy_name, *policy_key;
     size_t host_length, policy_name_length, policy_key_length;
-    long port;
+    long port ;
 
     php_uamqp_connection_object *connection_object;
 
@@ -24,6 +25,15 @@ METHOD(__construct)
     ZEND_PARSE_PARAMETERS_END();
 
     connection_object = php_uamqp_connection_fetch_object(Z_OBJ_P(getThis()));
+
+    if (port != PHP_UAMQP_AMQPS_PORT) {
+        char *message;
+        spprintf(&message, 0, "Invalid port %d, supported ports [%d]", port, PHP_UAMQP_AMQPS_PORT);
+
+        php_uamqp_throw_exception(message, 0);
+
+        efree(message);
+    }
 
     connection_object->properties.host = estrdup(host);
     connection_object->properties.port = port;

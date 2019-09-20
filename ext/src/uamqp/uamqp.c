@@ -68,8 +68,8 @@ struct uamqp_session create_uamqp_session(struct uamqp connection)
     struct uamqp_session session;
 
     session.session =  session_create(connection.connection, NULL, NULL);
-    session_set_incoming_window(session.session, 2147483647);
-    session_set_outgoing_window(session.session, 65536);
+    session_set_incoming_window(session.session, PHP_UAMQP_MAX_FRAME_SIZE_BYTES);
+    session_set_outgoing_window(session.session, PHP_UAMQP_MAX_FRAME_SIZE_BYTES);
 
     return session;
 }
@@ -123,7 +123,7 @@ struct uamqp_message_sender create_message_sender(struct uamqp_session uamqp_ses
 
     sender.link = link_create(uamqp_session.session, "sender-link", role_sender, source, target);
     link_set_snd_settle_mode(sender.link, sender_settle_mode_unsettled);
-    (void)link_set_max_message_size(sender.link , 65536);
+    (void)link_set_max_message_size(sender.link , PHP_UAMQP_MAX_MESSAGE_LENGTH_BYTES);
     link_subscribe_on_link_detach_received(sender.link, on_link_detach_received_producer, uamqp_session.session);
 
     amqpvalue_destroy(source);
