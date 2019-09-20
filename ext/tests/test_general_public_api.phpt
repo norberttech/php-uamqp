@@ -86,5 +86,10 @@ UAMQP\Producer::sendMessage(UAMQP\Message $message, UAMQP\Destination $destinati
 UAMQP\Consumer
 ------
 UAMQP\Consumer::__construct(UAMQP\Connection $message, int $settleMode)
-UAMQP\Consumer::listen(callable $callback, UAMQP\Destination $message) : void
+UAMQP\Consumer::open(UAMQP\Destination $destination) : void
+UAMQP\Consumer::receive() : void
+UAMQP\Consumer::accept() : void
+UAMQP\Consumer::release() : void
+UAMQP\Consumer::reject(string $errorCondition, string $errorDescription) : void
+UAMQP\Consumer::close() : void
 ------

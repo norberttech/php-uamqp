@@ -14,14 +14,23 @@ $consumer = new \UAMQP\Consumer($connection, \UAMQP\Consumer::RECEIVE_AND_DELETE
 
 $i = 0;
 
-$consumer->listen(function($message) use (&$i) {
-    $i++;
+$consumer->open($destination);
 
-    var_dump($i, $message);
+for ($t = 0; $t < 10; $t++) {
+    $message = $consumer->receive();
 
-    if ($i >= 4) {
-        return false;
+    if ($message) {
+        $i++;
+        var_dump($i, $message);
+
+        continue ;
     }
 
-    return true;
-}, $destination);
+    if ($i >= 4) {
+        break;
+    }
+
+    usleep(250000);
+}
+
+$consumer->close();
