@@ -38,7 +38,7 @@ jobs:
 
       - name: Configure PHP
         working-directory: ./ext/php-build/php-src
-        run: ./configure --without-iconv --enable-debug --enable-phpdbg --enable-sockets --with-curl --with-openssl --prefix=$PWD/../7.3.9 --with-config-file-path=$PWD/../7.3.9/php-ini
+        run: ./configure --enable-debug --enable-maintainer-zts --with-openssl --prefix=$PWD/../7.3.9 --with-config-file-path=$PWD/../7.3.9/php-ini
 
       - name: Build PHP
         working-directory: ./ext/php-build/php-src
@@ -57,7 +57,13 @@ jobs:
         env:
           PHP_UAMQP_PHP_EXECUTABLE: php-build/7.3.9/bin
 
-      - name: Build extension & run testsuite
+      - name: Build extension
+        working-directory: ./ext
+        run: make -j2 # github actions is executed at 2 core machines
+        env:
+          PHP_UAMQP_PHP_EXECUTABLE: php-build/7.2.22/bin
+
+      - name: Run testsuite
         working-directory: ./ext
         run: make test
         env:

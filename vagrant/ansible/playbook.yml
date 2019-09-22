@@ -39,6 +39,7 @@
         - "sqlite3"
         - "libsqlite3-dev"
         - "libcurl4-gnutls-dev"
+        - "libcurl4-openssl-dev"
       tags: ["tools", "php"]
 
     - name: Register PHP binary variable
@@ -61,13 +62,13 @@
         path: "{{ uamqpphp_php_ini }}"
         state: directory
 
-    - name: Clone php repository
-      git:
-        repo: 'https://github.com/php/php-src.git'
-        dest: "{{ uamqpphp_php_src }}"
-        version: "{{ uamqpphp_php_version }}"
-        force: yes
-      tags: ["tools", "php"]
+#    - name: Clone php repository
+#      git:
+#        repo: 'https://github.com/php/php-src.git'
+#        dest: "{{ uamqpphp_php_src }}"
+#        version: "{{ uamqpphp_php_version }}"
+#        force: yes
+#      tags: ["tools", "php"]
 
     - name: PHP Build Config
       shell:
@@ -75,22 +76,24 @@
         chdir: "{{ uamqpphp_php_src }}"
       tags: ["tools", "php"]
       when:
-        - php_bin.stat.exists == False
+        - php_bin.stat.exists == False or php_build_force == True
 
     - name: Configure PHP
       shell:
-        cmd: "./configure --without-iconv --enable-debug --enable-phpdbg --enable-sockets --with-curl --with-openssl --prefix={{ uamqpphp_php_bin }} --with-config-file-path={{ uamqpphp_php_ini }}"
+        cmd: "./configure {{ php_configure_options }} --prefix={{ uamqpphp_php_bin }} --with-config-file-path={{ uamqpphp_php_ini }}"
         chdir: "{{ uamqpphp_php_src }}"
       tags: ["tools", "php"]
       when:
-        - php_bin.stat.exists == False
+        - php_bin.stat.exists == False or php_build_force == True
 
     - name: Build PHP
       make:
         chdir: "{{ uamqpphp_php_src }}"
+        params:
+          j: "{{ php_compile_cores }}"
       tags: ["tools", "php"]
       when:
-        - php_bin.stat.exists == False
+        - php_bin.stat.exists == False or php_build_force == True
 
     - name: Install PHP
       make:
@@ -98,14 +101,14 @@
         target: install
       tags: ["tools", "php"]
       when:
-        - php_bin.stat.exists == False
+        - php_bin.stat.exists == False or php_build_force == True
 
     - name: Create php.ini directory
       file:
         path: "{{ uamqpphp_php_ini }}"
         state: directory
       when:
-        - php_bin.stat.exists == False
+        - php_bin.stat.exists == False or php_build_force == True
 
     - name: Copy development php.ini
       shell:
@@ -113,7 +116,7 @@
         chdir: "{{ uamqpphp_php_src }}"
       tags: ["tools", "php"]
       when:
-        - php_bin.stat.exists == False
+        - php_bin.stat.exists == False or php_build_force == True
 
     - name: Intall dependecies of azure-uamqp-c
       package:
@@ -124,7 +127,6 @@
         - "cmake"
         - "build-essential"
         - "curl"
-        - "libcurl4-openssl-dev"
         - "libssl-dev"
         - "uuid-dev"
       tags: ["tools", "azure-uamqp-c"]

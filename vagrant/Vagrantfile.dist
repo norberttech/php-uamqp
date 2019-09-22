@@ -22,10 +22,14 @@ Vagrant.configure(2) do |config|
       ansible.galaxy_command = "ansible-galaxy install --role-file=%{role_file} --roles-path=%{roles_path}"
       ansible.playbook = "ansible/playbook.yml"
       ansible.version = "2.5.4"
+      ansible.verbose = false
       ansible.install_mode = "pip"
       ansible.raw_arguments = [
         "--extra-vars='{
+            \"php_compile_cores\":\"2\",
+            \"php_build_force\":false,
             \"php_version\":\"7.3.9\",
+            \"php_configure_options\":\"--enable-debug --enable-maintainer-zts --with-openssl\",
             \"uamqp_host\": \"changeme\",
             \"uamqp_policy\": \"changeme\",
             \"uamqp_key\": \"changeme\",
