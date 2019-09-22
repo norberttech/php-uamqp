@@ -59,7 +59,7 @@ jobs:
 
       - name: Build extension
         working-directory: ./ext
-        run: make -j2 # github actions is executed at 2 core machines
+        run: make
         env:
           PHP_UAMQP_PHP_EXECUTABLE: php-build/7.2.22/bin
 
