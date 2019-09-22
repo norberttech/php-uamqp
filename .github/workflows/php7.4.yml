@@ -42,7 +42,7 @@ jobs:
 
       - name: Build PHP
         working-directory: ./ext/php-build/php-src
-        run: make
+        run: make -j2 # github actions is executed at 2 core machines
 
       - name: Install PHP
         working-directory: ./ext/php-build/php-src

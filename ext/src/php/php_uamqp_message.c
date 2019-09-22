@@ -20,8 +20,13 @@ METHOD(__construct)
 
     message_object = php_uamqp_message_fetch_object(Z_OBJ_P(getThis()));
 
-    if (payload_length > 64500) {
-        php_uamqp_throw_exception("Message payload can't be longer than 64500 characters.", 0);
+    if (payload_length > PHP_UAMQP_MAX_MESSAGE_LENGTH_BYTES) {
+        char *message;
+        spprintf(&message, 0, "Message payload can't be longer than %d characters, got %d.", PHP_UAMQP_MAX_MESSAGE_LENGTH_BYTES, payload_length);
+
+        php_uamqp_throw_exception(message, 0);
+
+        efree(message);
     }
 
     message_object->payload = estrdup(payload);
