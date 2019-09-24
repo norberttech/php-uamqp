@@ -78,6 +78,15 @@
       when:
         - php_bin.stat.exists == False or php_build_force == True
 
+    - name: PHP Make Clean
+      make:
+        chdir: "{{ uamqpphp_php_src }}"
+        target: clean
+      ignore_errors: true
+      tags: ["tools", "php"]
+      when:
+        - php_build_force == True
+
     - name: Configure PHP
       shell:
         cmd: "./configure {{ php_configure_options }} --prefix={{ uamqpphp_php_bin }} --with-config-file-path={{ uamqpphp_php_ini }}"

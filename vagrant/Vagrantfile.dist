@@ -3,14 +3,14 @@ ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 Vagrant.configure(2) do |config|
 
   config.vm.define :php_uamqp, primary: true do |php_uamqp|
-    php_uamqp.vm.box = "bento/ubuntu-16.04"
+    php_uamqp.vm.box = "bento/ubuntu-18.04"
     php_uamqp.vm.network :private_network, ip: "10.0.0.200"
     php_uamqp.ssh.forward_agent = true
 
     php_uamqp.vm.provider :virtualbox do |v|
       v.gui = false
       v.name = "php-uamqp"
-      v.memory = 4096
+      v.memory = 2048
       v.cpus = 2
     end
 
