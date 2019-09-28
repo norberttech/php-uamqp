@@ -30,13 +30,13 @@ under development, those methods might change. Do not use at production, it was 
 ### UAMQP\Connection
 
 ```php
-UAMQP\Connection::__construct(string $host, int $port, string $policy_name, string $policy_key)
+UAMQP\Connection::__construct(string $host, int $port, string $policyName, string $policyKey)
 UAMQP\Connection::enableDebugMode() : void
 UAMQP\Connection::disableDebugMode() : void
 UAMQP\Connection::host() : string
 UAMQP\Connection::port() : int
-UAMQP\Connection::policy_name() : string
-UAMQP\Connection::policy_key() : string
+UAMQP\Connection::policyName() : string
+UAMQP\Connection::policyKey() : string
 ```
 
 ### UAMQP\Message
