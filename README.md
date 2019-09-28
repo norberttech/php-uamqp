@@ -69,7 +69,7 @@ const \UAMQP\Receiver::PEAK_AND_LOCK = 1;
 \UAMQP\Consumer::__construct(\UAMQP\Connection $message)
 
 \UAMQP\Consumer::open(\UAMQP\Destination $destination, int $settleMode = \UAMQP\Receiver::RECEIVE_AND_DELETE) : void
-UAMQP\Consumer::receive() : void
+UAMQP\Consumer::receive() : ?\UAMQP\Message
 UAMQP\Consumer::accept() : void
 UAMQP\Consumer::release() : void
 UAMQP\Consumer::reject(string $errorCondition, string $errorDescription) : void
