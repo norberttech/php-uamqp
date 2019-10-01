@@ -33,7 +33,7 @@ $i = 0;
 
 $consumer->open($destination);
 
-for ($t = 0; $t < 10; $t++) {
+for ($t = 0; $t < 30; $t++) {
     $message = $consumer->receive();
 
     if ($message) {

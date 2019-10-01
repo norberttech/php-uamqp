@@ -29,7 +29,7 @@ $producer->sendMessage(new \UAMQP\Message($payload = "this is some random test m
 $consumer = new \UAMQP\Consumer($connection, \UAMQP\Consumer::RECEIVE_AND_DELETE);
 
 $consumer->open($destination);
-for ($i = 0; $i < 10; $i++) {
+for ($i = 0; $i < 30; $i++) {
     $message = $consumer->receive();
 
     if ($message) {
