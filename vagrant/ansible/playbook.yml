@@ -62,13 +62,13 @@
         path: "{{ uamqpphp_php_ini }}"
         state: directory
 
-#    - name: Clone php repository
-#      git:
-#        repo: 'https://github.com/php/php-src.git'
-#        dest: "{{ uamqpphp_php_src }}"
-#        version: "{{ uamqpphp_php_version }}"
-#        force: yes
-#      tags: ["tools", "php"]
+    - name: Clone php repository
+      git:
+        repo: 'https://github.com/php/php-src.git'
+        dest: "{{ uamqpphp_php_src }}"
+        version: "{{ uamqpphp_php_version }}"
+        force: yes
+      tags: ["tools", "php"]
 
     - name: PHP Build Config
       shell:
