@@ -3,7 +3,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
+#include <openssl/ssl.h>
 #include "php.h"
 #include "ext/standard/info.h"
 #include "php_uamqp.h"
@@ -27,6 +27,8 @@ PHP_MINFO_FUNCTION(uamqp)
 {
     php_info_print_table_start();
     php_info_print_table_header(2, "uamqp support", "enabled");
+    php_info_print_table_header(2, "OpenSSL version", SSLeay_version(SSLEAY_VERSION));
+    php_info_print_table_header(2, "OpenSSL Header Version", OPENSSL_VERSION_TEXT);
     php_info_print_table_end();
 }
 
